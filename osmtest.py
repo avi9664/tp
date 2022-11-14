@@ -51,6 +51,12 @@ def loadData(query):
     # This will probably take a few minutes.
     # In the meantime, go to the bathroom, get some coffee, stretch, touch grass...
 
+    # I'm also using a small module called tqdm which basically creates a progress
+    # bar in the console for tasks that take a long time, such as processing data.
+    # I don't think it really needs a tech demo because all you do is just call
+    # it inside a for loop. I'm going to delete it anyways once I have a loading
+    # screen. More info at https://github.com/tqdm/tqdm
+    
     for i in tqdm(range(len(buildings))):
         entry = buildings.iloc[i]
         polyCoords = np.array(extractCoords(entry['geometry']))

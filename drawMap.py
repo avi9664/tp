@@ -34,7 +34,6 @@ def appStarted(app):
                                         (app.buildings['cx'] > app.longMin) &
                                         (app.buildings['cy'] < app.latMax) &
                                         (app.buildings['cy'] > app.latMin)]
-
 def redrawAll(app, canvas):
     for i in range(len(app.buildingsToDraw)):
         building = app.buildingsToDraw.iloc[i]

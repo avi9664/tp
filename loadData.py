@@ -4,7 +4,6 @@ from pyrosm.data import sources
 from cmu_112_graphics import *
 import string, random
 
-
 # first task: dropdown
 # bounding box for clicky
 # type in stuff
