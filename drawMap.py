@@ -59,7 +59,9 @@ def mousePressed(app, event):
 def mouseDragged(app, event):
     app.mouseDist = [event.x - app.prevCoords[0], event.y - app.prevCoords[1]]
     app.prevCoords = [event.x, event.y]
-        
+
+# pan
+
 def mouseReleased(app, event):
     app.mouseDrag = False
     print('released')
