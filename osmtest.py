@@ -12,7 +12,8 @@ from tqdm import tqdm
 
 
 #####
-# integrated code from online pyrosm tutorial: 
+# all the extra parts are from:
+# online pyrosm tutorial: 
 # https://pyrosm.readthedocs.io/en/latest/basics.html#read-buildings
 # pandas:
 # https://pandas.pydata.org/docs/user_guide/10min.html 
@@ -56,7 +57,7 @@ def loadData(query):
     # I don't think it really needs a tech demo because all you do is just call
     # it inside a for loop. I'm going to delete it anyways once I have a loading
     # screen. More info at https://github.com/tqdm/tqdm
-    
+
     for i in tqdm(range(len(buildings))):
         entry = buildings.iloc[i]
         polyCoords = np.array(extractCoords(entry['geometry']))
