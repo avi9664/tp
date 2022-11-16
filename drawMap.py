@@ -17,6 +17,11 @@ from functions.convertCoords import toCanvasCoords, strToArray
 #####
 
 def adjustBounds(app):
+    app.latRadius = app.zoomFactor * 1000/364000
+    app.longRadius = app.zoomFactor * 1000/288200
+
+    app.dLat = app.zoomFactor / 364000
+    app.dLong = app.zoomFactor / 288200
     # https://stackoverflow.com/questions/36921951/truth-value-of-a-series-is-ambiguous-use-a-empty-a-bool-a-item-a-any-o
     # https://stackoverflow.com/questions/32713221/how-to-use-a-conditional-statement-based-on-dataframe-boolean-value-in-pandas
     app.latMin = app.lat - app.latRadius
@@ -34,11 +39,6 @@ def appStarted(app):
     # around the Exploratorium. From Google Maps.
     app.lat, app.long = 37.7549796,-122.4432489
     app.zoomFactor = 1 # in feet
-    app.latRadius = app.zoomFactor * 1000/364000
-    app.longRadius = app.zoomFactor * 1000/288200
-
-    app.dLat = app.zoomFactor / 364000
-    app.dLong = app.zoomFactor / 288200
 
     adjustBounds(app)
 
@@ -60,7 +60,12 @@ def mouseDragged(app, event):
     app.mouseDist = [event.x - app.prevCoords[0], event.y - app.prevCoords[1]]
     app.prevCoords = [event.x, event.y]
 
-# pan
+def keyPressed(app, event):
+    if event.key == 'z':
+        app.zoomFactor += 1
+    elif event.key == 'x':
+        app.zoomFactor -= 1
+    filterBuildings(app)
 
 def mouseReleased(app, event):
     app.mouseDrag = False
