@@ -92,7 +92,7 @@ def mouseMoved(app, event):
     filterBuildings(app)
 
 def keyPressed(app, event):
-
+    # press z and x to zoom
     if event.key == 'z':
         if (app.zoomFactor < 1.5):
             app.zoomFactor += 0.1
