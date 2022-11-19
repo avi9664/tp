@@ -23,12 +23,24 @@ def strToArray(s):
         arr[i,1] = longlat[1]
     return arr
 
-def toCanvasCoords(coords, minLat, minLong, maxLat, maxLong, cw, ch):
+def toCanvasCoords(coords, bounds, cw, ch, flattened=True):
+    minLong, minLat, maxLong, maxLat = bounds[0], bounds[1], bounds[2], bounds[3]
     newCoords = np.zeros(coords.shape)
-    newCoords[:,1] = (coords[:,1] - minLong)/(maxLong - minLong)
-    newCoords[:,0] = (coords[:,0] - minLat)/(maxLat - minLat)
-    newCoords[:,1] = cw - newCoords[:,1] * cw
-    newCoords[:,0] = newCoords[:,0] * ch
-    # format: lat, long
+    newCoords[:,0] = (coords[:,0] - minLong)/(maxLong - minLong)
+    newCoords[:,1] = (coords[:,1] - minLat)/(maxLat - minLat)
+    newCoords[:,0] = newCoords[:,0] * cw
+    newCoords[:,1] = ch - newCoords[:,1] * ch
+    # format: long, lat
+    if flattened:
+        return list(newCoords.flatten())
     return newCoords
     
+def toMapCoords(coords, bounds, cw, ch, 
+    flattened=True):
+    minLong, minLat, maxLong, maxLat = bounds[0], bounds[1], bounds[2], bounds[3]
+    newCoords = np.zeros(coords.shape)
+    newCoords[:,0] = coords[:,0] / cw * (maxLong - minLong) + minLong
+    newCoords[:,1] = (ch - coords[:,1]) / ch * (maxLat - minLat) + minLat
+    if flattened:
+        return list(newCoords.flatten())
+    return newCoords
