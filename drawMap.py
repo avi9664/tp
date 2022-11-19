@@ -1,8 +1,9 @@
 import pandas as pd
 import numpy as np
+import copy
 from cmu_112_graphics import *
 from functions.drawShapes import drawOval
-from functions.convertCoords import toCanvasCoords, strToArray
+from functions.convertCoords import toCanvasCoords, strToArray, toMapCoords
 from classes.pin import GuessPin
 
 # https://www.usgs.gov/faqs/how-much-distance-does-degree-minute-and-second-cover-your-maps
@@ -20,9 +21,11 @@ from classes.pin import GuessPin
 #####
 
 def adjustBounds(app):
+    # how far the map reaches on each side
     app.latRadius = app.zoomFactor * 1000/364000
     app.longRadius = app.zoomFactor * 1000/288200
 
+    # how much the map inches to the side when you pan it (using mouse or keys)
     app.dLat = app.zoomFactor / 364000
     app.dLong = app.zoomFactor / 288200
     # https://stackoverflow.com/questions/36921951/truth-value-of-a-series-is-ambiguous-use-a-empty-a-bool-a-item-a-any-o
@@ -42,7 +45,7 @@ def filterBuildings(app):
     
 
 def appStarted(app):
-    # around the Exploratorium. From Google Maps.
+    # Sutro Tower, SF. From Google Maps.
     app.lat, app.long = 37.7552, -122.4528
     app.zoomFactor = 1 # in feet
 
@@ -50,35 +53,52 @@ def appStarted(app):
 
     app.mouseDist = [0,0]
     app.prevCoords = [0,0]
-    app.mouseX = 0
-    app.mouseY = 0
+    app.oldCenter = [0,0]
+    app.mouseLongLat = [0,0]
     app.mouseDrag = False
-    app.mouseMovedDelay = 10
+    app.timerDelay = 50
+    app.mouseMovedDelay = 1
     app.pins = []
 
     app.buildings = pd.read_csv('SanFrancisco.csv')
     filterBuildings(app)
 
 # scoured the cmu_112_graphics file & found mousePressed & mouseDragged, basically
+# new plan:
+# when mouse pressed, keep track of old eventX and eventY (convert to longlat)
+# when mouse pressed, keep track of old long and old lat
+# convert event.x and event.y to long and lat, calculate distance
+# set lat and long to mouselong - old long and mouselat - old lat
+# when mouse is released, snap to new longlat
 
 def mousePressed(app, event):
+    app.mouseDrag = True
     app.pins = app.pins + [GuessPin(app, np.array([[event.x, event.y]]), 1)]
-    app.prevCoords = [event.x, event.y]
 
-def mouseDragged(app, event):
-    app.mouseDist = [event.x - app.prevCoords[0], event.y - app.prevCoords[1]]
-    app.prevCoords = [event.x, event.y]
-    app.lat += app.mouseDist[1] * app.dLat
-    app.long += -1 * app.mouseDist[0] * app.dLong
+def mouseMoved(app, event):
+    if (app.prevCoords == [0,0] or app.oldCenter == [0,0]):
+        app.prevCoords = toMapCoords(np.array([[event.x, event.y]]), app.bounds, 
+                        app.width, app.height)
+        # print(app.prevCoords)
+        app.oldCenter = [app.long, app.lat]
+    app.mouseLongLat = toMapCoords(np.array([[event.x, event.y]]), app.bounds, 
+                    app.width, app.height)
+    print(app.prevCoords)
+    app.mouseDist = [app.mouseLongLat[0] - app.prevCoords[0], 
+                        app.mouseLongLat[1] - app.prevCoords[1]]
+    app.lat = app.oldCenter[1] - app.mouseDist[1]
+    app.long = app.oldCenter[0] - app.mouseDist[0]
     adjustBounds(app)
     filterBuildings(app)
 
 def keyPressed(app, event):
 
     if event.key == 'z':
-        app.zoomFactor += 1
+        if (app.zoomFactor < 1.5):
+            app.zoomFactor += 0.1
     elif event.key == 'x':
-        app.zoomFactor -= 1
+        if (app.zoomFactor > 0.1):
+            app.zoomFactor -= 0.1
     elif event.key == 'Right':
         app.long += app.dLong * 50
     elif event.key == 'Left':
@@ -92,19 +112,36 @@ def keyPressed(app, event):
 
 def mouseReleased(app, event):
     app.mouseDrag = False
+    app.mouseDist = [0,0]
+    app.oldCenter = [0,0]
 
-    # print(app.dx, app.dy)
-        
+  # print(app.dx, app.dy)
+
+def redrawPolygons(app, canvas):
+    step = 2
+    numBuildings = len(app.buildingsToDraw)
+
+    # i is starting index; we start at every nth building and smoosh coordinates
+    # of the next n buildings together, then draw all coords as "one" polygon
+    for i in range(0, numBuildings, step):
+        end = numBuildings if (i + step >= numBuildings) else i + step 
+        polygonCoords = []
+        for j in range(i, end):
+            building = app.buildingsToDraw.iloc[j]
+            coords = strToArray(building['coords'], True)
+            coords = coords + [copy.copy(coords[0])]
+            polygonCoords = polygonCoords + coords
+        polygonCoords = np.array(polygonCoords)
+        canvasCoords = toCanvasCoords(polygonCoords, app.bounds, app.width, app.height)
+        canvas.create_polygon(canvasCoords,fill='gray')
+
 
 def redrawAll(app, canvas):
+    # draw a dot where Sutro Tower is for testing
     sutroTower = toCanvasCoords(np.array([[-122.4528, 37.7552]]), app.bounds, 
                                 app.width, app.height)
     drawOval(canvas, sutroTower[0], sutroTower[1], 5, 'red')
-    for i in range(len(app.buildingsToDraw)):
-        building = app.buildingsToDraw.iloc[i]
-        coords = strToArray(building['coords'])
-        canvasCoords = toCanvasCoords(coords, app.bounds, app.width, app.height)
-        canvas.create_polygon(canvasCoords,fill='gray')
+    redrawPolygons(app, canvas)
     for pin in app.pins:
         pin.redrawPin(app, canvas)
 

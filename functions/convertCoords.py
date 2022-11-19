@@ -8,7 +8,7 @@ from functions.extractCoords import stripParens
 
 ## maybe use repr and eval? (eval is dangerous)
 
-def strToArray(s):
+def strToArray(s, toList=False):
     s = stripParens(s)
     splitCoords = s.split('\n ')
     arr = np.zeros((len(splitCoords),2))
@@ -21,6 +21,9 @@ def strToArray(s):
                     longlat.remove(string)
         arr[i,0] = longlat[0]
         arr[i,1] = longlat[1]
+    if toList:
+        # https://www.sharpsightlabs.com/blog/numpy-array-to-list/
+        return arr.tolist()
     return arr
 
 def toCanvasCoords(coords, bounds, cw, ch, flattened=True):
