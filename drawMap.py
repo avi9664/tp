@@ -75,7 +75,7 @@ def mousePressed(app, event):
     app.mouseDrag = True
     app.pins = app.pins + [GuessPin(app, np.array([[event.x, event.y]]), 1)]
 
-def mouseMoved(app, event):
+def mouseDragged(app, event):
     if (app.prevCoords == [0,0] or app.oldCenter == [0,0]):
         app.prevCoords = toMapCoords(np.array([[event.x, event.y]]), app.bounds, 
                         app.width, app.height)
