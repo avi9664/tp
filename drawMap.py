@@ -77,9 +77,15 @@ def appStarted(app):
 
 def mousePressed(app, event):
     app.mouseDrag = True
-    app.pins = app.pins + [GuessPin(app, np.array([[event.x, event.y]]), app.guessNum)]
+    app.pins = app.pins + [GuessPin(app, [event.x, event.y], app.guessNum)]
     app.guessNum += 1
     
+def mouseMoved(app, event):
+    for pin in app.pins:
+        pin.displayStats = False
+        # from animations with oop: https://www.cs.cmu.edu/~112/notes/notes-oop-part1.html#oopExample
+        if (pin.mouseNearby(event.x, event.y)):
+            pin.displayStats = True
 
 def mouseDragged(app, event):
     if (app.prevCoords == [0,0] or app.oldCenter == [0,0]):
@@ -121,24 +127,16 @@ def mouseReleased(app, event):
     app.mouseDist = [0,0]
     app.oldCenter = [0,0]
 
-  # print(app.dx, app.dy)
-
 def redrawPolygons(app, canvas):
     step = 2
     numBuildings = len(app.buildingsToDraw)
 
     # i is starting index; we start at every nth building and smoosh coordinates
     # of the next n buildings together, then draw all coords as "one" polygon
-    for i in range(0, numBuildings, step):
-        end = numBuildings if (i + step >= numBuildings) else i + step 
-        polygonCoords = []
-        for j in range(i, end):
-            building = app.buildingsToDraw.iloc[j]
-            coords = strToArray(building['coords'], True)
-            coords = coords + [copy.copy(coords[0])]
-            polygonCoords = polygonCoords + coords
-        polygonCoords = np.array(polygonCoords)
-        canvasCoords = toCanvasCoords(polygonCoords, app.bounds, app.width, app.height)
+    for i in range(numBuildings):
+        building = app.buildingsToDraw.iloc[i]
+        coords = strToArray(building['coords'])
+        canvasCoords = toCanvasCoords(coords, app.bounds, app.width, app.height)
         canvas.create_polygon(canvasCoords,fill='gray')
 
 
