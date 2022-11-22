@@ -49,6 +49,10 @@ def appStarted(app):
     app.lat, app.long = 37.7552, -122.4528
     app.zoomFactor = 1 # in feet
 
+    # twin peaks
+    app.answer = [-122.4528, 37.7552]
+    app.guessNum = 1
+
     adjustBounds(app)
 
     app.mouseDist = [0,0]
@@ -73,7 +77,9 @@ def appStarted(app):
 
 def mousePressed(app, event):
     app.mouseDrag = True
-    app.pins = app.pins + [GuessPin(app, np.array([[event.x, event.y]]), 1)]
+    app.pins = app.pins + [GuessPin(app, np.array([[event.x, event.y]]), app.guessNum)]
+    app.guessNum += 1
+    
 
 def mouseDragged(app, event):
     if (app.prevCoords == [0,0] or app.oldCenter == [0,0]):
