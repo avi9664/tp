@@ -1,9 +1,10 @@
 import pandas as pd
 import numpy as np
-import copy
+import random
 from cmu_112_graphics import *
 from functions.drawShapes import drawOval
 from functions.convertCoords import toCanvasCoords, strToArray, toMapCoords
+from functions.mouseInBounds import mouseInBounds
 from classes.pin import GuessPin
 
 # https://www.usgs.gov/faqs/how-much-distance-does-degree-minute-and-second-cover-your-maps
@@ -38,11 +39,11 @@ def adjustBounds(app):
                 app.long + app.longRadius, app.lat + app.latRadius]
 
 def filterBuildings(app):
+    # bug fixing: https://stackoverflow.com/questions/17216153/python-pandas-boolean-indexing-on-multiple-columns
     app.buildingsToDraw = app.buildings[(app.buildings['cx'] < app.longMax) & 
                                         (app.buildings['cx'] > app.longMin) &
                                         (app.buildings['cy'] < app.latMax) &
                                         (app.buildings['cy'] > app.latMin)]
-    
 
 def appStarted(app):
     # Sutro Tower, SF. From Google Maps.
@@ -50,7 +51,8 @@ def appStarted(app):
     app.zoomFactor = 1 # in feet
 
     # twin peaks
-    app.answer = [-122.4528, 37.7552]
+    app.answer = {'name': 'Sutro Tower', 'pt': [-122.4528, 37.7552]} 
+    app.answerList = []
     app.guessNum = 1
 
     adjustBounds(app)
@@ -66,6 +68,14 @@ def appStarted(app):
 
     app.buildings = pd.read_csv('SanFrancisco.csv')
     filterBuildings(app)
+    # https://pyrosm.readthedocs.io/en/latest/basics.html#read-points-of-interest
+    # frankly I do not give a damn about parking. public transportation for the win
+    app.possibleAnswers = app.buildings[(pd.notna(app.buildings['name'])) &
+                                        (pd.notna(app.buildings['coords'])) &  
+                                    (((pd.notna(app.buildings['amenity'])) & 
+                                (app.buildings['amenity'] != 'parking')) | 
+                            (pd.notna(app.buildings['shop'])))]
+    
 
 # scoured the cmu_112_graphics file & found mousePressed & mouseDragged, basically
 # new plan:
@@ -77,8 +87,23 @@ def appStarted(app):
 
 def mousePressed(app, event):
     app.mouseDrag = True
-    app.pins = app.pins + [GuessPin(app, [event.x, event.y], app.guessNum)]
-    app.guessNum += 1
+    newPin = GuessPin(app, [event.x, event.y], app.guessNum)
+    app.pins = app.pins + [newPin]
+
+    if (newPin.distance <= 100):
+        newAns = app.possibleAnswers.iloc[random.randint(0,len(app.possibleAnswers) - 1)]
+        app.answerList = app.answerList + [{'name': app.answer['name'], 'guesses': app.guessNum}]
+        app.answer['name'] = newAns['name']
+        app.answer['pt'] = [newAns['cx'], newAns['cy']]
+        app.long, app.lat = newAns['cx'], newAns['cy']
+        app.guessNum = 1
+        print(app.answerList)
+        adjustBounds(app)
+        filterBuildings(app)
+    else:
+        app.guessNum += 1
+        
+
     
 def mouseMoved(app, event):
     for pin in app.pins:

@@ -47,6 +47,8 @@ def loadData(query):
     # from https://www.geeksforgeeks.org/python-pandas-dataframe-astype/#:~:text=astype()%20method%20is%20used,type%20to%20another%20data%20type.
     buildings['coords'] = buildings['coords'].astype('object')
 
+    
+
 
     # somehow have a loading screen that says:
     # This will probably take a few minutes.
@@ -67,7 +69,7 @@ def loadData(query):
         buildings.at[i,'coords'] = polyCoords
 
     print(buildings['cx'][20])
-    buildings.to_csv(f'{query}.csv')
+    # buildings.to_csv(f'{query}.csv')
 
 
 

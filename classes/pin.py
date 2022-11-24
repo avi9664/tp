@@ -13,6 +13,7 @@
 
 from cmu_112_graphics import *
 from functions.convertCoords import toMapCoords, toCanvasCoords
+from functions.mouseInBounds import mouseInBounds
 import math
 from functions.drawShapes import drawPin, angle
 import numpy as np
@@ -33,14 +34,13 @@ class GuessPin:
         # normalize distance so that it's in between 0 and 1
         # find a better scale for this
 
-        answerLong = app.answer[0]
-        answerLat = app.answer[1]
+        answerLong = app.answer['pt'][0]
+        answerLat = app.answer['pt'][1]
         self.distance, self.angle = findDistance(self.mapCoords[:,0], self.mapCoords[:,1],
                                                  answerLong, answerLat)
         self.normDist = 1 - (math.sqrt(self.distance) / 100)
         if self.normDist < 0: self.normDist = 0
 
-        print(self.angle)
         self.num = guessNum
         # 1 degree of latitude ~ 364000 ft ~ around 69 miles
         # 1000 ft = 0.0027 degrees of longitude
@@ -76,9 +76,7 @@ class GuessPin:
     def mouseNearby(self, mouseX, mouseY):
         canvasX = self.canvasCoords[0]
         canvasY = self.canvasCoords[1]
-        if (canvasX - 15 < mouseX < canvasX + 15 and
-            canvasY - 15 < mouseY < canvasY + 15):
-            return True
+        return mouseInBounds(canvasX, canvasY, 30, 30, mouseX, mouseY)
 
     def drawArrow(self, canvas, theta, dist):
         tailX, tailY = self.canvasCoords[0], self.canvasCoords[1]
@@ -88,8 +86,6 @@ class GuessPin:
         canvas.create_line(tailX, tailY, headX, headY, fill='black', width=3)
         canvas.create_line(headX, headY, leftX, leftY, fill='black', width=3)
         canvas.create_line(headX, headY, rightX, rightY, fill='black', width=3)
-
-
 
     def redrawPin(self, app, canvas):
         self.canvasCoords = toCanvasCoords(self.mapCoords, app.bounds, app.width, app.height, 
