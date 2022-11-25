@@ -6,6 +6,7 @@ from functions.drawShapes import drawOval
 from functions.convertCoords import toCanvasCoords, strToArray, toMapCoords
 from functions.mouseInBounds import mouseInBounds
 from classes.pin import GuessPin
+from classes.dashboard import Dashboard
 
 # https://www.usgs.gov/faqs/how-much-distance-does-degree-minute-and-second-cover-your-maps
 # longitude is East-West (x direction)
@@ -51,7 +52,7 @@ def appStarted(app):
     app.zoomFactor = 1 # in feet
 
     # twin peaks
-    app.answer = {'name': 'Sutro Tower', 'pt': [-122.4528, 37.7552]} 
+    app.answer = {'name': 'Sutro Tower', 'pt': [-122.4528, 37.7552], 'category': 'alien summoner'} 
     app.answerList = []
     app.guessNum = 1
 
@@ -75,7 +76,26 @@ def appStarted(app):
                                     (((pd.notna(app.buildings['amenity'])) & 
                                 (app.buildings['amenity'] != 'parking')) | 
                             (pd.notna(app.buildings['shop'])))]
+    # print(app.possibleAnswers['coords'].unique())
+    app.dashboard = Dashboard(app)
     
+def reset(app):
+    app.dashboard.answerParts = app.answer['name']
+    app.pins = []
+
+    newAns = app.possibleAnswers.iloc[random.randint(0,len(app.possibleAnswers) - 1)]
+    app.answerList = app.answerList + [{'name': app.answer['name'], 'guesses': app.guessNum}]
+    app.answer['name'] = newAns['name']
+    app.answer['category'] = newAns['amenity'] if pd.notna(newAns['amenity']) else newAns['shop']
+    app.answer['pt'] = [newAns['cx'], newAns['cy']]
+
+    app.long, app.lat = newAns['cx'], newAns['cy']
+    app.guessNum = 1
+
+    adjustBounds(app)
+    filterBuildings(app)
+    app.dashboard.newBlanks(app)
+    app.dashboard.formatLines()
 
 # scoured the cmu_112_graphics file & found mousePressed & mouseDragged, basically
 # new plan:
@@ -91,17 +111,11 @@ def mousePressed(app, event):
     app.pins = app.pins + [newPin]
 
     if (newPin.distance <= 100):
-        newAns = app.possibleAnswers.iloc[random.randint(0,len(app.possibleAnswers) - 1)]
-        app.answerList = app.answerList + [{'name': app.answer['name'], 'guesses': app.guessNum}]
-        app.answer['name'] = newAns['name']
-        app.answer['pt'] = [newAns['cx'], newAns['cy']]
-        app.long, app.lat = newAns['cx'], newAns['cy']
-        app.guessNum = 1
-        print(app.answerList)
-        adjustBounds(app)
-        filterBuildings(app)
+        reset(app)
     else:
         app.guessNum += 1
+        app.dashboard.addLetters(app)
+        app.dashboard.formatLines()
         
 
     
@@ -173,6 +187,7 @@ def redrawAll(app, canvas):
     redrawPolygons(app, canvas)
     for pin in app.pins:
         pin.redrawPin(app, canvas)
+    app.dashboard.drawHints(app, canvas)
 
 def drawMap():
     canvasWidth = 1000
