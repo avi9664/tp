@@ -55,6 +55,7 @@ def appStarted(app):
     app.answer = {'name': 'Sutro Tower', 'pt': [-122.4528, 37.7552], 'category': 'alien summoner'} 
     app.answerList = []
     app.guessNum = 1
+    app.guessLimit = 10
 
     adjustBounds(app)
 
@@ -187,7 +188,7 @@ def redrawAll(app, canvas):
     redrawPolygons(app, canvas)
     for pin in app.pins:
         pin.redrawPin(app, canvas)
-    app.dashboard.drawHints(app, canvas)
+    app.dashboard.redraw(app, canvas)
 
 def drawMap():
     canvasWidth = 1000

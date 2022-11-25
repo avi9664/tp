@@ -8,13 +8,13 @@ def drawOval(canvas, cx, cy, r, fill, outline='white', width=2):
     y1 = cy + r
     canvas.create_oval(x0, y0, x1, y1, fill=fill, outline=outline, width=width)
 
-def drawPin(canvas, color, x, y, text=None):
+def drawPin(canvas, color, x, y, text=None, outline='white'):
     r = 5
     needleWidth = 2
     h = y - r * 8
     canvas.create_polygon(x - needleWidth, h + 2*r, x, y, x + needleWidth,
                         h + 2*r, fill='white', outline='black', width=2)
-    drawOval(canvas, x, h + r, r*2, color)
+    drawOval(canvas, x, h + r, r*2, color, outline=outline)
     if text != None:
         canvas.create_text(x, h + r, text=text, fill='white')
 

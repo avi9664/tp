@@ -1,4 +1,5 @@
 import random
+from functions.drawShapes import drawPin
 
 class Dashboard:
     def __init__(self, app):
@@ -41,12 +42,7 @@ class Dashboard:
             self.answerParts = self.answerParts[:i] + ans[i] + self.answerParts[i+1:]
         
     # draw name of building and the amenity it is
-    def drawHints(self, app, canvas):
-        font = 24
-        smallerFont = 16
-        m = font
-        w = font * 17 + 2*m
-        h = (smallerFont + 10) + (font + 10) * len(self.formattedHint) + 2*m
+    def drawHints(self, app, canvas, font, smallerFont, m, w, h):
         cx = app.width/2
         canvas.create_rectangle(cx - w/2, m, cx + w/2, h + m, fill='white', outline='black')
         for i in range(len(self.formattedHint)):
@@ -54,9 +50,24 @@ class Dashboard:
             canvas.create_text(cx, m * 2 + (font + 10) * i, text=line, 
                             font=f'Arial {font} bold')
         canvas.create_text(cx, h - m, text=app.answer['category'], 
-                        font=f'Arial {smallerFont}') 
+                        font=f'Arial {smallerFont}', anchor='n')
+    
+    # draw guesses left
+    def drawGuesses(self, app, canvas, font, smallerFont, m, w, h):
+        pinWidth = 10
+        guessW = m + 2*pinWidth + 5 * smallerFont
+        xPin = app.width - m - guessW
+        y = m + h/2
+        drawPin(canvas, 'white', xPin + m + pinWidth/2, y + pinWidth * 2, None, 'black')
+        text = f'{str(app.guessNum)}/{str(app.guessLimit)}'
+        canvas.create_text(app.width - 2*m, y, text=text, 
+                            font=f'Arial {smallerFont}', anchor='e')
 
-
-    def redraw(app, canvas):
-        # drawLabel(app, canvas)
-        pass
+    def redraw(self, app, canvas):
+        font = 24
+        smallerFont = 18
+        m = font
+        w = app.width - 2*m
+        h = (smallerFont + 10) + (font + 10) * len(self.formattedHint) + 2*m
+        self.drawHints(app, canvas, font, smallerFont, m, w, h)
+        self.drawGuesses(app, canvas, font, smallerFont, m, w, h)
