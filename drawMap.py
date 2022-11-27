@@ -7,6 +7,7 @@ from functions.convertCoords import toCanvasCoords, strToArray, toMapCoords
 from functions.mouseInBounds import mouseInBounds
 from classes.pin import GuessPin
 from classes.dashboard import Dashboard
+from classes.map import Map
 
 # https://www.usgs.gov/faqs/how-much-distance-does-degree-minute-and-second-cover-your-maps
 # longitude is East-West (x direction)
@@ -36,8 +37,7 @@ def adjustBounds(app):
     app.longMin = app.long - app.longRadius
     app.latMax = app.lat + app.latRadius
     app.longMax = app.long + app.longRadius
-    app.bounds = [app.long - app.longRadius, app.lat - app.latRadius,
-                app.long + app.longRadius, app.lat + app.latRadius]
+    app.bounds = [app.longMin, app.latMin, app.longMax, app.latMax]
 
 def filterBuildings(app):
     # bug fixing: https://stackoverflow.com/questions/17216153/python-pandas-boolean-indexing-on-multiple-columns
@@ -48,11 +48,19 @@ def filterBuildings(app):
 
 def appStarted(app):
     # Sutro Tower, SF. From Google Maps.
-    app.lat, app.long = 37.7552, -122.4528
     app.zoomFactor = 1 # in feet
 
     # twin peaks
-    app.answer = {'name': 'Sutro Tower', 'pt': [-122.4528, 37.7552], 'category': 'alien summoner'} 
+    app.answer = {'name': 'Sutro Tower', 
+                    'pt': [-122.4528, 37.7552], 
+                    'category': 'alien summoner'} 
+    dispX, dispY = random.randint(-1500, 1500), random.randint(-1500, 1500)
+
+    app.startLong = app.answer['pt'][0] #+ dispX/288200
+    app.startLat = app.answer['pt'][1] #+ dispY/364000
+    app.long = app.startLong
+    app.lat = app.startLat
+    
     app.answerList = []
     app.guessNum = 1
     app.guessLimit = 10
@@ -69,7 +77,6 @@ def appStarted(app):
     app.pins = []
 
     app.buildings = pd.read_csv('SanFrancisco.csv')
-    filterBuildings(app)
     # https://pyrosm.readthedocs.io/en/latest/basics.html#read-points-of-interest
     # frankly I do not give a damn about parking. public transportation for the win
     app.possibleAnswers = app.buildings[(pd.notna(app.buildings['name'])) &
@@ -78,6 +85,8 @@ def appStarted(app):
                                 (app.buildings['amenity'] != 'parking')) | 
                             (pd.notna(app.buildings['shop'])))]
     # print(app.possibleAnswers['coords'].unique())
+    app.mapObject = Map(app)
+    app.map = app.mapObject.createMap(app)
     app.dashboard = Dashboard(app)
     
 def reset(app):
@@ -90,11 +99,17 @@ def reset(app):
     app.answer['category'] = newAns['amenity'] if pd.notna(newAns['amenity']) else newAns['shop']
     app.answer['pt'] = [newAns['cx'], newAns['cy']]
 
-    app.long, app.lat = newAns['cx'], newAns['cy']
+    dispX, dispY = random.randint(-1500, 1500), random.randint(-1500, 1500)
+    app.startLong = app.answer['pt'][0] + dispX/288200
+    app.long = app.startLong
+    app.startLat = app.answer['pt'][1] + dispY/364000
+    app.lat = app.startLat
+
     app.guessNum = 1
 
     adjustBounds(app)
-    filterBuildings(app)
+    app.mapObject.reset(app)
+    app.map = app.mapObject.createMap(app)
     app.dashboard.newBlanks(app)
     app.dashboard.formatLines()
 
@@ -127,21 +142,21 @@ def mouseMoved(app, event):
         if (pin.mouseNearby(event.x, event.y)):
             pin.displayStats = True
 
-def mouseDragged(app, event):
-    if (app.prevCoords == [0,0] or app.oldCenter == [0,0]):
-        app.prevCoords = toMapCoords(np.array([[event.x, event.y]]), app.bounds, 
-                        app.width, app.height)
-        # print(app.prevCoords)
-        app.oldCenter = [app.long, app.lat]
-    app.mouseLongLat = toMapCoords(np.array([[event.x, event.y]]), app.bounds, 
-                    app.width, app.height)
-    print(app.prevCoords)
-    app.mouseDist = [app.mouseLongLat[0] - app.prevCoords[0], 
-                        app.mouseLongLat[1] - app.prevCoords[1]]
-    app.lat = app.oldCenter[1] - app.mouseDist[1]
-    app.long = app.oldCenter[0] - app.mouseDist[0]
-    adjustBounds(app)
-    filterBuildings(app)
+# def mouseDragged(app, event):
+#     if (app.prevCoords == [0,0] or app.oldCenter == [0,0]):
+#         app.prevCoords = toMapCoords(np.array([[event.x, event.y]]), app.bounds, 
+#                         app.width, app.height)
+#         # print(app.prevCoords)
+#         app.oldCenter = [app.long, app.lat]
+#     app.mouseLongLat = toMapCoords(np.array([[event.x, event.y]]), app.bounds, 
+#                     app.width, app.height)
+#     print(app.prevCoords)
+#     app.mouseDist = [app.mouseLongLat[0] - app.prevCoords[0], 
+#                         app.mouseLongLat[1] - app.prevCoords[1]]
+#     app.lat = app.oldCenter[1] - app.mouseDist[1]
+#     app.long = app.oldCenter[0] - app.mouseDist[0]
+#     adjustBounds(app)
+#     filterBuildings(app)
 
 def keyPressed(app, event):
     # press z and x to zoom
@@ -160,32 +175,25 @@ def keyPressed(app, event):
     elif event.key == 'Down':
         app.lat -= app.dLat * 50
     adjustBounds(app)
-    filterBuildings(app)
 
 def mouseReleased(app, event):
     app.mouseDrag = False
     app.mouseDist = [0,0]
     app.oldCenter = [0,0]
 
-def redrawPolygons(app, canvas):
-    step = 2
-    numBuildings = len(app.buildingsToDraw)
-
-    # i is starting index; we start at every nth building and smoosh coordinates
-    # of the next n buildings together, then draw all coords as "one" polygon
-    for i in range(numBuildings):
-        building = app.buildingsToDraw.iloc[i]
-        coords = strToArray(building['coords'])
-        canvasCoords = toCanvasCoords(coords, app.bounds, app.width, app.height)
-        canvas.create_polygon(canvasCoords,fill='gray')
-
+# from animations pt 4
+def getCachedPhotoImage(app, image):
+    # stores a cached version of the PhotoImage in the PIL/Pillow image
+    if ('cachedPhotoImage' not in image.__dict__):
+        image.cachedPhotoImage = ImageTk.PhotoImage(image)
+    return image.cachedPhotoImage
 
 def redrawAll(app, canvas):
-    # draw a dot where Sutro Tower is for testing
-    sutroTower = toCanvasCoords(np.array([[-122.4528, 37.7552]]), app.bounds, 
-                                app.width, app.height)
-    drawOval(canvas, sutroTower[0], sutroTower[1], 5, 'red')
-    redrawPolygons(app, canvas)
+    scaledMap = app.scaleImage(app.map, 1/2)
+    mapCenter = toCanvasCoords(np.array([[app.startLong, app.startLat]]), 
+                app.bounds, app.width, app.height)
+    cachedImage = getCachedPhotoImage(app, scaledMap)
+    canvas.create_image(mapCenter[0], mapCenter[1], image=cachedImage)
     for pin in app.pins:
         pin.redrawPin(app, canvas)
     app.dashboard.redraw(app, canvas)

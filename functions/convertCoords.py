@@ -38,6 +38,7 @@ def toCanvasCoords(coords, bounds, cw, ch, flattened=True):
         return list(newCoords.flatten())
     return newCoords
     
+    
 def toMapCoords(coords, bounds, cw, ch, 
     flattened=True):
     minLong, minLat, maxLong, maxLat = bounds[0], bounds[1], bounds[2], bounds[3]

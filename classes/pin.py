@@ -93,6 +93,7 @@ class GuessPin:
         drawPin(canvas, self.color, self.canvasCoords[0], self.canvasCoords[1], str(self.num))
         if self.displayStats:
             textY = self.canvasCoords[1] + 10 if (self.angle > 0) else self.canvasCoords[1] - 50
+            # if distance > 1000 feet, return dist in miles; if not, then return distance in feet
             distStr = f'{int(self.distance)} ft' if (self.distance < 1000) else f'{round(self.distance/5280, 1)} mi'
             canvas.create_text(self.canvasCoords[0], textY, text=distStr)
             self.drawArrow(canvas, self.angle, (1 - self.normDist) * 60 + 10)
