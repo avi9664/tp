@@ -1,5 +1,4 @@
 import numpy as np
-from functions.extractCoords import stripParens
 
 #####
 # numpy:
@@ -48,3 +47,49 @@ def toMapCoords(coords, bounds, cw, ch,
     if flattened:
         return list(newCoords.flatten())
     return newCoords
+
+
+def stripParens(s):
+    while (not s[0].isdigit() and s[0] != '-'):
+        s = s[1:]
+    while (not s[-1].isdigit() and s[-1] != '.'):
+        s = s[:-1]
+    return s
+
+def extractCoords(polygon):
+    s = str(polygon)
+    leftParens = s.find('(')
+    coordsOnly = s[leftParens+2:-2]
+    coordList = []
+    for pair in coordsOnly.split(', '):
+        latlong = pair.split(' ')
+        long = float(stripParens(latlong[0]))
+        lat = float(stripParens(latlong[1]))
+        coordList = coordList + [[long, lat]]
+    return coordList
+
+def formatLines(s):
+        splitAnswer = s.split(' ')
+        lines = ['']
+        charLength = 0
+        for word in splitAnswer:
+            charLength += len(word) + 1
+            if charLength > 17:
+                charLength = 0
+                lines = lines + [f'{word} ']
+            else:
+                lines[-1] += f'{word} '
+        return lines
+
+
+def findCentroid(polygon):
+    s = str(polygon.centroid)
+    stripped = s[7:-1]
+    latlong = stripped.split(' ')
+    long = float(latlong[0])
+    lat = float(latlong[1])
+    return long, lat
+
+def findCentroidWithNumPy(longlats):
+    centroid = np.mean(longlats, axis=0)
+    return centroid[0], centroid[1]

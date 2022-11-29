@@ -1,5 +1,5 @@
 from cmu_112_graphics import *
-from functions.convertCoords import strToArray, toCanvasCoords
+from functions.strArrayStuff import strToArray, toCanvasCoords, toMapCoords
 import pandas as pd
 import numpy as np
 import random
@@ -7,17 +7,18 @@ import random
 class Map:
     def __init__(self, app):
         # converting to longlat
-        self.width = 10000
+        self.width = 8000
         self.reset(app)
     
     # from Animations, part 4 of the 15-112 website
     def createMap(self, app):
-        mapImage = Image.new('RGB', (self.width, self.width), '#FFFFFF')
+        self.imageWidth = 4000
+        mapImage = Image.new('RGB', (self.imageWidth, self.imageWidth), '#FFFFFF')
         draw = ImageDraw.Draw(mapImage)
         for i in range(len(self.buildingsToDraw)):
             building = self.buildingsToDraw.iloc[i]
             coords = strToArray(building['coords'])
-            canvasCoords = toCanvasCoords(coords, self.bounds, self.width, self.width)
+            canvasCoords = toCanvasCoords(coords, self.bounds, self.imageWidth, self.imageWidth)
             # https://pillow.readthedocs.io/en/stable/reference/ImageDraw.html#PIL.ImageDraw.ImageDraw.polygon
             draw.polygon(canvasCoords,fill='gray')
         return mapImage
@@ -26,6 +27,19 @@ class Map:
         self.mapBounds(app)
         self.filterBuildings(app)
 
+    # def mouseDragged(app, event):
+    #     if (app.prevCoords == [0,0] or app.oldCenter == [0,0]):
+    #         app.prevCoords = toMapCoords(np.array([[event.x, event.y]]), app.bounds, 
+    #                         app.width, app.height)
+    #         # print(app.prevCoords)
+    #         app.oldCenter = [app.long, app.lat]
+    #     app.mouseLongLat = toMapCoords(np.array([[event.x, event.y]]), app.bounds, 
+    #                     app.width, app.height)
+    #     print(app.prevCoords)
+    #     app.mouseDist = [app.mouseLongLat[0] - app.prevCoords[0], 
+    #                         app.mouseLongLat[1] - app.prevCoords[1]]
+    #     app.lat = app.oldCenter[1] - app.mouseDist[1]
+    #     app.long = app.oldCenter[0] - app.mouseDist[0]
 
     def mapBounds(self,app):
         radius = self.width/2

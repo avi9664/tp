@@ -1,24 +1,12 @@
 import random
 from functions.drawShapes import drawPin
+from functions.strArrayStuff import formatLines
 
 class Dashboard:
     def __init__(self, app):
         self.newBlanks(app)
-        self.formatLines()
+        self.formattedHint = formatLines(self.answerParts)
 
-    # account for multiple-lines
-    def formatLines(self):
-        splitAnswer = self.answerParts.split(' ')
-        lines = ['']
-        charLength = 0
-        for word in splitAnswer:
-            charLength += len(word) + 1
-            if charLength > 17:
-                charLength = 0
-                lines = lines + [f'{word} ']
-            else:
-                lines[-1] += f'{word} '
-        self.formattedHint = lines
 
     # turn answer into a bunch of underscores, hangman style
     # e.g. "Sutro Tower" to "_____ _____"

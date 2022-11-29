@@ -12,7 +12,7 @@
 # redrawClues (an arrow pointing in the direction of the mystery location, and some text hinting at how far away it is) ✅
 
 from cmu_112_graphics import *
-from functions.convertCoords import toMapCoords, toCanvasCoords
+from functions.strArrayStuff import toMapCoords, toCanvasCoords
 from functions.mouseInBounds import mouseInBounds
 import math
 from functions.drawShapes import drawPin, angle
@@ -87,7 +87,7 @@ class GuessPin:
         canvas.create_line(headX, headY, leftX, leftY, fill='black', width=3)
         canvas.create_line(headX, headY, rightX, rightY, fill='black', width=3)
 
-    def redrawPin(self, app, canvas):
+    def redraw(self, app, canvas):
         self.canvasCoords = toCanvasCoords(self.mapCoords, app.bounds, app.width, app.height, 
             flattened=True)
         drawPin(canvas, self.color, self.canvasCoords[0], self.canvasCoords[1], str(self.num))

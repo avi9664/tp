@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 # import file code from 
 # https://stackoverflow.com/questions/4383571/importing-files-from-different-folder?page=1&tab=scoredesc#tab-top
-from functions.extractCoords import findCentroid, extractCoords, findCentroidWithNumPy
+from functions.strArrayStuff import findCentroid, extractCoords, findCentroidWithNumPy
 
 # progress bar from https://stackoverflow.com/questions/3160699/python-progress-bar
 from tqdm import tqdm

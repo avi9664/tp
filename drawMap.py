@@ -3,11 +3,13 @@ import numpy as np
 import random
 from cmu_112_graphics import *
 from functions.drawShapes import drawOval
-from functions.convertCoords import toCanvasCoords, strToArray, toMapCoords
+from functions.strArrayStuff import toCanvasCoords, strToArray, toMapCoords
 from functions.mouseInBounds import mouseInBounds
 from classes.pin import GuessPin
 from classes.dashboard import Dashboard
 from classes.map import Map
+from classes.popup import PopUp
+from classes.button import Button
 
 # https://www.usgs.gov/faqs/how-much-distance-does-degree-minute-and-second-cover-your-maps
 # longitude is East-West (x direction)
@@ -88,7 +90,12 @@ def appStarted(app):
     app.mapObject = Map(app)
     app.map = app.mapObject.createMap(app)
     app.dashboard = Dashboard(app)
+    app.testPopUp = PopUp(app, ["whot's that i'm smellin'",
+                                Button('find out', 100, 100, testFunction)],'Test Heading!')
     
+def testFunction():
+    print("taste of india!")
+
 def reset(app):
     app.dashboard.answerParts = app.answer['name']
     app.pins = []
@@ -133,7 +140,6 @@ def mousePressed(app, event):
         app.dashboard.addLetters(app)
         app.dashboard.formatLines()
         
-
     
 def mouseMoved(app, event):
     for pin in app.pins:
@@ -189,14 +195,16 @@ def getCachedPhotoImage(app, image):
     return image.cachedPhotoImage
 
 def redrawAll(app, canvas):
-    scaledMap = app.scaleImage(app.map, 1/2)
+    scaledMap = app.scaleImage(app.map, 1)
     mapCenter = toCanvasCoords(np.array([[app.startLong, app.startLat]]), 
                 app.bounds, app.width, app.height)
     cachedImage = getCachedPhotoImage(app, scaledMap)
     canvas.create_image(mapCenter[0], mapCenter[1], image=cachedImage)
     for pin in app.pins:
-        pin.redrawPin(app, canvas)
+        pin.redraw(app, canvas)
     app.dashboard.redraw(app, canvas)
+    app.testPopUp.redraw(app, canvas)
+
 
 def drawMap():
     canvasWidth = 1000
