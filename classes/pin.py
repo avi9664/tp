@@ -12,7 +12,7 @@
 # redrawClues (an arrow pointing in the direction of the mystery location, and some text hinting at how far away it is) ✅
 
 from cmu_112_graphics import *
-from functions.strArrayStuff import toMapCoords, toCanvasCoords
+from functions.strArrayStuff import toMapCoords, toCanvasCoords, friendlyDistString
 from functions.mouseInBounds import mouseInBounds
 import math
 from functions.drawShapes import drawPin, angle
@@ -40,6 +40,7 @@ class GuessPin:
                                                  answerLong, answerLat)
         self.normDist = 1 - (math.sqrt(self.distance) / 100)
         if self.normDist < 0: self.normDist = 0
+        self.distStr = friendlyDistString(self.distance)
 
         self.num = guessNum
         # 1 degree of latitude ~ 364000 ft ~ around 69 miles
@@ -94,8 +95,7 @@ class GuessPin:
         if self.displayStats:
             textY = self.canvasCoords[1] + 10 if (self.angle > 0) else self.canvasCoords[1] - 50
             # if distance > 1000 feet, return dist in miles; if not, then return distance in feet
-            distStr = f'{int(self.distance)} ft' if (self.distance < 1000) else f'{round(self.distance/5280, 1)} mi'
-            canvas.create_text(self.canvasCoords[0], textY, text=distStr)
+            canvas.create_text(self.canvasCoords[0], textY, text=self.distStr)
             self.drawArrow(canvas, self.angle, (1 - self.normDist) * 60 + 10)
 
         

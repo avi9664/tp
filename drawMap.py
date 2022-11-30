@@ -3,7 +3,7 @@ import numpy as np
 import random
 from cmu_112_graphics import *
 from functions.drawShapes import drawOval
-from functions.strArrayStuff import toCanvasCoords, strToArray, toMapCoords
+from functions.strArrayStuff import *
 from functions.mouseInBounds import mouseInBounds
 from classes.pin import GuessPin
 from classes.dashboard import Dashboard
@@ -48,7 +48,7 @@ def filterBuildings(app):
                                         (app.buildings['cy'] < app.latMax) &
                                         (app.buildings['cy'] > app.latMin)]
 
-def appStarted(app):
+def startGame(app):
     # Sutro Tower, SF. From Google Maps.
     app.zoomFactor = 1 # in feet
 
@@ -56,7 +56,8 @@ def appStarted(app):
     app.answer = {'name': 'Sutro Tower', 
                     'pt': [-122.4528, 37.7552], 
                     'category': 'alien summoner'} 
-    dispX, dispY = random.randint(-1500, 1500), random.randint(-1500, 1500)
+    app.r = 4000
+    dispX, dispY = random.randint(-1 * app.r, app.r), random.randint(-1 * app.r, app.r)
 
     app.startLong = app.answer['pt'][0] #+ dispX/288200
     app.startLat = app.answer['pt'][1] #+ dispY/364000
@@ -64,7 +65,7 @@ def appStarted(app):
     app.lat = app.startLat
     
     app.answerList = []
-    app.guessNum = 1
+    app.guessNum = 0
     app.guessLimit = 10
 
     adjustBounds(app)
@@ -90,13 +91,13 @@ def appStarted(app):
     app.mapObject = Map(app)
     app.map = app.mapObject.createMap(app)
     app.dashboard = Dashboard(app)
-    app.testPopUp = PopUp(app, ["whot's that i'm smellin'",
-                                Button('find out', 100, 100, testFunction)],'Test Heading!')
-    
-def testFunction():
-    print("taste of india!")
+    app.popUpDisplayed = None
+    app.win = False
 
 def reset(app):
+    app.mode = 'gameMode'
+    app.win = False
+    app.popUpDisplayed = None
     app.dashboard.answerParts = app.answer['name']
     app.pins = []
 
@@ -106,19 +107,19 @@ def reset(app):
     app.answer['category'] = newAns['amenity'] if pd.notna(newAns['amenity']) else newAns['shop']
     app.answer['pt'] = [newAns['cx'], newAns['cy']]
 
-    dispX, dispY = random.randint(-1500, 1500), random.randint(-1500, 1500)
+    dispX, dispY = random.randint(-1 * app.r, app.r), random.randint(-1 * app.r, app.r)
     app.startLong = app.answer['pt'][0] + dispX/288200
     app.long = app.startLong
     app.startLat = app.answer['pt'][1] + dispY/364000
     app.lat = app.startLat
 
-    app.guessNum = 1
+    app.guessNum = 0
 
     adjustBounds(app)
     app.mapObject.reset(app)
     app.map = app.mapObject.createMap(app)
     app.dashboard.newBlanks(app)
-    app.dashboard.formatLines()
+    app.dashboard.formattedHint = formatLines(app.dashboard.answerParts)
 
 # scoured the cmu_112_graphics file & found mousePressed & mouseDragged, basically
 # new plan:
@@ -128,20 +129,31 @@ def reset(app):
 # set lat and long to mouselong - old long and mouselat - old lat
 # when mouse is released, snap to new longlat
 
-def mousePressed(app, event):
+def gameMode_mousePressed(app, event):
     app.mouseDrag = True
+    app.guessNum += 1
     newPin = GuessPin(app, [event.x, event.y], app.guessNum)
     app.pins = app.pins + [newPin]
 
     if (newPin.distance <= 100):
-        reset(app)
+        app.win = True
+        app.popUpDisplayed = PopUp(app, ['You got the answer in',['PIN',f'*{app.guessNum}*'],
+                                Button('Start a new game!', reset)],'Correct!')
+        app.mode = 'endMode'
+    elif (app.guessNum >= app.guessLimit):
+        app.win = False
+        closest = friendlyDistString(min([pin.distance for pin in app.pins]))
+        app.popUpDisplayed = PopUp(app, [f"The answer was {app.answer['name']}!",
+            f'Your closest guess was {closest} away.',
+            "(Go look the answer up on Google Maps.)",
+            Button('Start a new game!', reset)], 'Game Over!')
+        app.mode = 'endMode'
     else:
-        app.guessNum += 1
         app.dashboard.addLetters(app)
-        app.dashboard.formatLines()
+        app.dashboard.formattedHint = formatLines(app.dashboard.answerParts)
         
     
-def mouseMoved(app, event):
+def gameMode_mouseMoved(app, event):
     for pin in app.pins:
         pin.displayStats = False
         # from animations with oop: https://www.cs.cmu.edu/~112/notes/notes-oop-part1.html#oopExample
@@ -164,8 +176,9 @@ def mouseMoved(app, event):
 #     adjustBounds(app)
 #     filterBuildings(app)
 
-def keyPressed(app, event):
+def gameMode_keyPressed(app, event):
     # press z and x to zoom
+    shift = 100
     if event.key == 'z':
         if (app.zoomFactor < 1.5):
             app.zoomFactor += 0.1
@@ -173,16 +186,16 @@ def keyPressed(app, event):
         if (app.zoomFactor > 0.1):
             app.zoomFactor -= 0.1
     elif event.key == 'Right':
-        app.long += app.dLong * 50
+        app.long += app.dLong * shift
     elif event.key == 'Left':
-        app.long -= app.dLong * 50
+        app.long -= app.dLong * shift
     elif event.key == 'Up':
-        app.lat += app.dLat * 50
+        app.lat += app.dLat * shift
     elif event.key == 'Down':
-        app.lat -= app.dLat * 50
+        app.lat -= app.dLat * shift
     adjustBounds(app)
 
-def mouseReleased(app, event):
+def gameMode_mouseReleased(app, event):
     app.mouseDrag = False
     app.mouseDist = [0,0]
     app.oldCenter = [0,0]
@@ -194,7 +207,7 @@ def getCachedPhotoImage(app, image):
         image.cachedPhotoImage = ImageTk.PhotoImage(image)
     return image.cachedPhotoImage
 
-def redrawAll(app, canvas):
+def gameMode_redrawAll(app, canvas):
     scaledMap = app.scaleImage(app.map, 1)
     mapCenter = toCanvasCoords(np.array([[app.startLong, app.startLat]]), 
                 app.bounds, app.width, app.height)
@@ -203,12 +216,3 @@ def redrawAll(app, canvas):
     for pin in app.pins:
         pin.redraw(app, canvas)
     app.dashboard.redraw(app, canvas)
-    app.testPopUp.redraw(app, canvas)
-
-
-def drawMap():
-    canvasWidth = 1000
-    canvasHeight = 1000
-    runApp(width=canvasWidth, height=canvasHeight)
-
-drawMap()

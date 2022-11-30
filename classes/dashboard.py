@@ -47,7 +47,7 @@ class Dashboard:
         xPin = app.width - m - guessW
         y = m + h/2
         drawPin(canvas, 'white', xPin + m + pinWidth/2, y + pinWidth * 2, None, 'black')
-        text = f'{str(app.guessNum)}/{str(app.guessLimit)}'
+        text = f'{str(app.guessLimit - app.guessNum)} left'
         canvas.create_text(app.width - 2*m, y, text=text, 
                             font=f'Arial {smallerFont}', anchor='e')
 

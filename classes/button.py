@@ -1,16 +1,23 @@
+from functions.strArrayStuff import formatLines
 class Button:
-    def __init__(self, value, w, h, function, unfocused='AntiqueWhite3', 
+    def __init__(self, value, function, unfocused='AntiqueWhite3', 
         focused='AntiqueWhite2', textColor='black'):
-        self.w = w
-        self.h = h
+        self.fontSize = 16
+        self.m = self.fontSize
+        self.w = len(value) * self.fontSize + 2 * self.m
+        self.h = len(formatLines(value)) * self.fontSize + 2 * self.m
         self.value = value
         self.function = function
         self.colorSet = [unfocused, focused]
         self.textColor = textColor
         self.isFocused = False
+        self.x, self.y = 0, 0
     
     def mouseHover(self):
         self.isFocused = True
+        
+    def mousePressed(self, app):
+        self.function(app)
 
     def redraw(self, canvas, x, y):
         x0 = x - self.w/2

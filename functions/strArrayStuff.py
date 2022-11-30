@@ -25,6 +25,10 @@ def strToArray(s, toList=False):
         return arr.tolist()
     return arr
 
+# displays the distance in comprehensible units instead of weird wonky longlat units
+def friendlyDistString(d):
+    return f'{int(d)} ft' if (d < 1000) else f'{round(d/5280, 1)} mi'
+
 def toCanvasCoords(coords, bounds, cw, ch, flattened=True):
     minLong, minLat, maxLong, maxLat = bounds[0], bounds[1], bounds[2], bounds[3]
     newCoords = np.zeros(coords.shape)

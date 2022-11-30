@@ -13,14 +13,14 @@ class Map:
     # from Animations, part 4 of the 15-112 website
     def createMap(self, app):
         self.imageWidth = 4000
-        mapImage = Image.new('RGB', (self.imageWidth, self.imageWidth), '#FFFFFF')
+        mapImage = Image.new('RGB', (self.imageWidth, self.imageWidth), '#F5F5F5')
         draw = ImageDraw.Draw(mapImage)
         for i in range(len(self.buildingsToDraw)):
             building = self.buildingsToDraw.iloc[i]
             coords = strToArray(building['coords'])
             canvasCoords = toCanvasCoords(coords, self.bounds, self.imageWidth, self.imageWidth)
             # https://pillow.readthedocs.io/en/stable/reference/ImageDraw.html#PIL.ImageDraw.ImageDraw.polygon
-            draw.polygon(canvasCoords,fill='gray')
+            draw.polygon(canvasCoords,fill='#8B8378')
         return mapImage
 
     def reset(self, app):

@@ -10,7 +10,7 @@ class PopUp:
         self.content = content
         self.heading = heading
         self.fontSize = 18
-        self.headingSize = 24
+        self.headingSize = 36
         self.m = self.headingSize
         self.w = self.m * 2 + self.fontSize * 17
         self.heights = self.measureHeight(self.content)
@@ -40,8 +40,10 @@ class PopUp:
         elif isinstance(L[0], str):
             if L[0] == 'PIN':
                 return [40] + self.measureHeight(L[1:])
-            h = [len(formatLines(L[0])) * (self.fontSize)] + self.measureHeight(L[1:])
+            h = [len(formatLines(L[0])) * (self.fontSize + 5)] + self.measureHeight(L[1:])
             return h
+        elif isinstance(L[0], int) or isinstance(L[0], float):
+            return [self.fontSize] + self.measureHeight(L[1:])
     
     def drawPopUp(self, app, canvas):
         x0 = self.cx - self.w/2
@@ -52,24 +54,24 @@ class PopUp:
     
     def drawContentHelper(self, app, canvas, item, startX, startY):
         if isinstance(item, Button):
+            # for mousePressed
+            item.x, item.y = startX, startY + item.h/2
             item.redraw(canvas, startX, startY)
+            return None
         elif isinstance(item, str):
             if item == 'PIN':
-                drawPin(canvas, 'red', startX, startY)
+                drawPin(canvas, 'red', startX, startY + 40)
             else:
-                canvas.create_text(startX, startY, text=item, 
-                    font=f'Arial {self.fontSize}', anchor='n')
-        elif isinstance(item, list):
-            middle = len(item) // 2
-            tempStartX = startX
-            for i in range(middle,len(item)):
-                self.drawContentHelper(app, canvas, item, tempStartX, startY)
-                # placeholder that I won't change for now unless I'm drawing 3+ items on one line
-                tempStartX += 10
-            tempStartX = startX
-            for i in range(0, middle):
-                self.drawContentHelper(app, canvas, item, tempStartX, startY)
-                tempStartX -= 10
+                font = self.fontSize
+                # heading
+                if item[0] == '*':
+                    font = {self.headingSize}
+                    item = item[1:-1]
+                for line in formatLines(item):
+                    canvas.create_text(startX, startY, text=line, 
+                        font=f'Arial {font}', anchor='n')
+                    startY += font + 5
+            return None
 
 
     def drawContent(self, app, canvas):
@@ -79,8 +81,16 @@ class PopUp:
                     font=f'Arial {self.headingSize} bold', anchor='n')
         startY += self.headingSize + 15
         for i in range(len(self.content)):
+            startX = self.cx
             item = self.content[i]
-            self.drawContentHelper(app, canvas, item, startX, startY)
+            if isinstance(item, list):
+                spacing = 30
+                startX -= len(self.content)//2 * spacing
+                for j in range(len(item)):
+                    self.drawContentHelper(app, canvas, item[j], startX, startY)
+                    startX += spacing
+            else:
+                self.drawContentHelper(app, canvas, item, startX, startY)
             startY += self.heights[i] + 5
 
 
