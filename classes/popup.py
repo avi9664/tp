@@ -10,7 +10,7 @@ class PopUp:
         self.content = content
         self.heading = heading
         self.fontSize = 18
-        self.headingSize = 36
+        self.headingSize = 24
         self.m = self.headingSize
         self.w = self.m * 2 + self.fontSize * 17
         self.heights = self.measureHeight(self.content)
@@ -65,7 +65,7 @@ class PopUp:
                 font = self.fontSize
                 # heading
                 if item[0] == '*':
-                    font = {self.headingSize}
+                    font = self.headingSize
                     item = item[1:-1]
                 for line in formatLines(item):
                     canvas.create_text(startX, startY, text=line, 
