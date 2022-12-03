@@ -74,6 +74,7 @@ def startGame(app):
     app.prevCoords = [0,0]
     app.oldCenter = [0,0]
     app.mouseLongLat = [0,0]
+    app.mouseCoords = [0,0]
     app.mouseDrag = False
     app.pins = []
 
@@ -163,6 +164,14 @@ def gameMode_mousePressed(app, event):
     else:
         app.dashboard.addLetters(app)
         app.dashboard.formattedHint = formatLines(app.dashboard.answerParts)
+
+def gameMode_mouseDragged(app, event):
+    app.mouseCoords = [event.x, event.y]
+
+def gameMode_mouseReleased(app, event):
+    app.mouseDrag = False
+    app.mouseDist = [0,0]
+    app.oldCenter = [0,0]
         
 # hide popUp to display the answer on the map
 def showAnswer(app):
@@ -177,11 +186,16 @@ def hideAnswer(app):
 
 # display stats when you hover over pin
 def gameMode_mouseMoved(app, event):
+    app.mouseCoords = [event.x, event.y]
     for pin in app.pins:
         pin.displayStats = False
         # from animations with oop: https://www.cs.cmu.edu/~112/notes/notes-oop-part1.html#oopExample
         if (pin.mouseNearby(event.x, event.y)):
             pin.displayStats = True
+
+def gameMode_timerFired(app):
+    app.mapObject.mouseDragged(app)
+    adjustBounds(app)
 
 # def mouseDragged(app, event):
 #     if (app.prevCoords == [0,0] or app.oldCenter == [0,0]):
@@ -217,11 +231,6 @@ def gameMode_keyPressed(app, event):
     elif event.key == 'Down':
         app.lat -= app.dLat * shift
     adjustBounds(app)
-
-def gameMode_mouseReleased(app, event):
-    app.mouseDrag = False
-    app.mouseDist = [0,0]
-    app.oldCenter = [0,0]
 
 
 def gameMode_redrawAll(app, canvas):

@@ -4,7 +4,7 @@ from endMode import *
 
 def appStarted(app):
     app.timerDelay = 50
-    app.mouseMovedDelay = 10
+    app.mouseMovedDelay = 5
     app.mode = 'gameMode'
     startGame(app)
 

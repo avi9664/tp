@@ -27,19 +27,18 @@ class Map:
         self.mapBounds(app)
         self.filterBuildings(app)
 
-    # def mouseDragged(app, event):
-    #     if (app.prevCoords == [0,0] or app.oldCenter == [0,0]):
-    #         app.prevCoords = toMapCoords(np.array([[event.x, event.y]]), app.bounds, 
-    #                         app.width, app.height)
-    #         # print(app.prevCoords)
-    #         app.oldCenter = [app.long, app.lat]
-    #     app.mouseLongLat = toMapCoords(np.array([[event.x, event.y]]), app.bounds, 
-    #                     app.width, app.height)
-    #     print(app.prevCoords)
-    #     app.mouseDist = [app.mouseLongLat[0] - app.prevCoords[0], 
-    #                         app.mouseLongLat[1] - app.prevCoords[1]]
-    #     app.lat = app.oldCenter[1] - app.mouseDist[1]
-    #     app.long = app.oldCenter[0] - app.mouseDist[0]
+    def mouseDragged(self, app):
+        if app.mouseDrag:
+            mouseX = app.mouseCoords[0]
+            mouseY = app.mouseCoords[1]
+            if (app.prevCoords == [0,0] or app.oldCenter == [0,0]):
+                app.prevCoords = [mouseX, mouseY]
+                app.oldCenter = [app.long, app.lat]
+            app.mouseDist = [mouseX - app.prevCoords[0], mouseY - app.prevCoords[1]]
+            # print(app.oldCenter)         
+            # print(mouseX, mouseY, app.prevCoords, app.mouseDist)
+            app.lat = app.oldCenter[1] + app.mouseDist[1]/364000
+            app.long = app.oldCenter[0] - app.mouseDist[0]/288200
 
     def mapBounds(self,app):
         radius = self.width/2
