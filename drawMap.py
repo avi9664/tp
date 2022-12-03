@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import random
 from cmu_112_graphics import *
-from functions.drawShapes import drawOval
+from functions.drawShapes import drawOval, renderMap
 from functions.strArrayStuff import *
 from functions.mouseInBounds import mouseInBounds
 from classes.pin import GuessPin
@@ -55,7 +55,7 @@ def startGame(app):
     # twin peaks
     app.answer = {'name': 'Sutro Tower', 
                     'pt': [-122.4528, 37.7552], 
-                    'category': 'alien summoner'} 
+                    'category': 'tower'} 
     app.r = 4000
     dispX, dispY = random.randint(-1 * app.r, app.r), random.randint(-1 * app.r, app.r)
 
@@ -92,12 +92,15 @@ def startGame(app):
     app.map = app.mapObject.createMap(app)
     app.dashboard = Dashboard(app)
     app.popUpDisplayed = None
+    app.bg = None
     app.win = False
 
+# reset the game after you win/lose
 def reset(app):
     app.mode = 'gameMode'
     app.win = False
     app.popUpDisplayed = None
+    app.bg = None
     app.dashboard.answerParts = app.answer['name']
     app.pins = []
 
@@ -129,6 +132,13 @@ def reset(app):
 # set lat and long to mouselong - old long and mouselat - old lat
 # when mouse is released, snap to new longlat
 
+def takeAnswerScreenshot(app):
+    app.long, app.lat = app.answer['pt'][0], app.answer['pt'][1] 
+    adjustBounds(app)
+    snapshot = app.getSnapshot()
+    app.bg = app.scaleImage(snapshot, 0.05)
+    
+
 def gameMode_mousePressed(app, event):
     app.mouseDrag = True
     app.guessNum += 1
@@ -137,22 +147,37 @@ def gameMode_mousePressed(app, event):
 
     if (newPin.distance <= 100):
         app.win = True
+        takeAnswerScreenshot(app)
         app.popUpDisplayed = PopUp(app, ['You got the answer in',['PIN',f'*{app.guessNum}*'],
+                                Button('Reveal the answer', showAnswer),
                                 Button('Start a new game!', reset)],'Correct!')
+        app.bg = app.getSnapshot()
         app.mode = 'endMode'
     elif (app.guessNum >= app.guessLimit):
         app.win = False
+        takeAnswerScreenshot(app)
         closest = friendlyDistString(min([pin.distance for pin in app.pins]))
         app.popUpDisplayed = PopUp(app, [f"The answer was {app.answer['name']}!",
             f'Your closest guess was {closest} away.',
-            "(Go look the answer up on Google Maps.)",
+            Button('Reveal the answer', showAnswer),
             Button('Start a new game!', reset)], 'Game Over!')
         app.mode = 'endMode'
     else:
         app.dashboard.addLetters(app)
         app.dashboard.formattedHint = formatLines(app.dashboard.answerParts)
         
-    
+# hide popUp to display the answer on the map
+def showAnswer(app):
+    app.popUpDisplayed.visible = False
+    app.backButton = Button('Back', hideAnswer)
+    margin = 24
+    app.backButton.x = margin + app.backButton.w/2
+    app.backButton.y = margin + app.backButton.h/2
+
+def hideAnswer(app):
+    app.popUpDisplayed.visible = True
+
+# display stats when you hover over pin
 def gameMode_mouseMoved(app, event):
     for pin in app.pins:
         pin.displayStats = False
@@ -177,7 +202,7 @@ def gameMode_mouseMoved(app, event):
 #     filterBuildings(app)
 
 def gameMode_keyPressed(app, event):
-    # press z and x to zoom
+    # press z and x to zoom, arrow keys to pan
     shift = 100
     if event.key == 'z':
         if (app.zoomFactor < 1.5):
@@ -200,19 +225,7 @@ def gameMode_mouseReleased(app, event):
     app.mouseDist = [0,0]
     app.oldCenter = [0,0]
 
-# from animations pt 4
-def getCachedPhotoImage(app, image):
-    # stores a cached version of the PhotoImage in the PIL/Pillow image
-    if ('cachedPhotoImage' not in image.__dict__):
-        image.cachedPhotoImage = ImageTk.PhotoImage(image)
-    return image.cachedPhotoImage
 
 def gameMode_redrawAll(app, canvas):
-    scaledMap = app.scaleImage(app.map, 1)
-    mapCenter = toCanvasCoords(np.array([[app.startLong, app.startLat]]), 
-                app.bounds, app.width, app.height)
-    cachedImage = getCachedPhotoImage(app, scaledMap)
-    canvas.create_image(mapCenter[0], mapCenter[1], image=cachedImage)
-    for pin in app.pins:
-        pin.redraw(app, canvas)
+    renderMap(app, canvas)
     app.dashboard.redraw(app, canvas)

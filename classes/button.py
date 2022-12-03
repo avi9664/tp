@@ -21,9 +21,9 @@ class Button:
 
     def redraw(self, canvas, x, y):
         x0 = x - self.w/2
-        y0 = y
+        y0 = y - self.h/2
         x1 = x + self.w/2
-        y1 = y + self.h
+        y1 = y + self.h/2
         color = self.colorSet[1] if self.isFocused else self.colorSet[0]
         canvas.create_rectangle(x0, y0, x1, y1, fill=color)
         cx = (x1 + x0)/2

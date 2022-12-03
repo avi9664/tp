@@ -20,7 +20,7 @@ class PopUp:
         self.h = sum(self.heights) + spacing + headingSpacing + self.m * 2
         self.cx = app.width/2
         self.cy = app.height/2
-
+        self.visible = True
 
     def drawBg(self, app, canvas):
         # aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
@@ -56,7 +56,7 @@ class PopUp:
         if isinstance(item, Button):
             # for mousePressed
             item.x, item.y = startX, startY + item.h/2
-            item.redraw(canvas, startX, startY)
+            item.redraw(canvas, startX, startY + item.h/2)
             return None
         elif isinstance(item, str):
             if item == 'PIN':

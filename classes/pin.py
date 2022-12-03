@@ -79,6 +79,7 @@ class GuessPin:
         canvasY = self.canvasCoords[1]
         return mouseInBounds(canvasX, canvasY, 30, 30, mouseX, mouseY)
 
+    # draw arow pointing to answer
     def drawArrow(self, canvas, theta, dist):
         tailX, tailY = self.canvasCoords[0], self.canvasCoords[1]
         headX, headY = angle(self.canvasCoords[0], self.canvasCoords[1], theta, dist)
