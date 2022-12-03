@@ -1,4 +1,5 @@
 from functions.strArrayStuff import formatLines
+from functions.mouseInBounds import mouseInBounds
 class Button:
     def __init__(self, value, function, unfocused='AntiqueWhite3', 
         focused='AntiqueWhite2', textColor='black'):
@@ -18,6 +19,9 @@ class Button:
         
     def mousePressed(self, app):
         self.function(app)
+
+    def mouseNearby(self, mouseX, mouseY):
+        return mouseInBounds(self.x, self.y, self.w, self.h, mouseX, mouseY)
 
     def redraw(self, canvas, x, y):
         x0 = x - self.w/2

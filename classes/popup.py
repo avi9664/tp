@@ -85,7 +85,7 @@ class PopUp:
             item = self.content[i]
             if isinstance(item, list):
                 spacing = 30
-                startX -= len(self.content)//2 * spacing
+                startX -= len(self.content)//2 * spacing/2
                 for j in range(len(item)):
                     self.drawContentHelper(app, canvas, item[j], startX, startY)
                     startX += spacing

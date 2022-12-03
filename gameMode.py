@@ -75,8 +75,6 @@ def startGame(app):
     app.oldCenter = [0,0]
     app.mouseLongLat = [0,0]
     app.mouseDrag = False
-    app.timerDelay = 50
-    app.mouseMovedDelay = 1
     app.pins = []
 
     app.buildings = pd.read_csv('SanFrancisco.csv')
