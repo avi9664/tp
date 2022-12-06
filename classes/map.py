@@ -4,15 +4,23 @@ import pandas as pd
 import numpy as np
 import random
 
+# from animations pt 4 in 112 website
+def getCachedPhotoImage(app, image):
+    # stores a cached version of the PhotoImage in the PIL/Pillow image
+    if ('cachedPhotoImage' not in image.__dict__):
+        image.cachedPhotoImage = ImageTk.PhotoImage(image)
+    return image.cachedPhotoImage
+
 class Map:
     def __init__(self, app):
         # converting to longlat
-        self.width = 8000
+        self.width = app.r * 2
+        self.imageWidth = app.r
+        self.zoom = self.width/(2 * self.imageWidth)
         self.reset(app)
     
     # from Animations, part 4 of the 15-112 website
     def createMap(self, app):
-        self.imageWidth = 4000
         mapImage = Image.new('RGB', (self.imageWidth, self.imageWidth), '#F5F5F5')
         draw = ImageDraw.Draw(mapImage)
         for i in range(len(self.buildingsToDraw)):
@@ -27,6 +35,18 @@ class Map:
         self.mapBounds(app)
         self.filterBuildings(app)
 
+    def renderMap(self, app, canvas):
+        canvas.create_rectangle(0,0, app.width, app.height, outline='', 
+            fill='MistyRose4')
+        scaledMap = app.scaleImage(app.map, self.zoom)
+        mapCenter = toCanvasCoords(np.array([[app.startLong, app.startLat]]), 
+                    app.bounds, app.width, app.height)
+        cachedImage = getCachedPhotoImage(app, scaledMap)
+        canvas.create_image(mapCenter[0], mapCenter[1], image=cachedImage)
+        for pin in app.pins:
+            pin.redraw(app, canvas)
+
+    # pan map
     def mouseDragged(self, app):
         if app.mouseDrag:
             mouseX = app.mouseCoords[0]
@@ -35,8 +55,6 @@ class Map:
                 app.prevCoords = [mouseX, mouseY]
                 app.oldCenter = [app.long, app.lat]
             app.mouseDist = [mouseX - app.prevCoords[0], mouseY - app.prevCoords[1]]
-            # print(app.oldCenter)         
-            # print(mouseX, mouseY, app.prevCoords, app.mouseDist)
             app.lat = app.oldCenter[1] + app.mouseDist[1]/364000
             app.long = app.oldCenter[0] - app.mouseDist[0]/288200
 

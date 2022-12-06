@@ -20,27 +20,9 @@ def drawPin(canvas, color, x, y, text=None, outline='white'):
     if text != None:
         canvas.create_text(x, h + r, text=text, fill='white')
 
+# find coords from a distance from a point (x0, y0) at a certain angle
 def angle(x0, y0, thetaInDegs, dist):
     theta = thetaInDegs * math.pi/180
     x1 = x0 + dist*math.cos(theta)
     y1 = y0 - dist*math.sin(theta)
     return x1, y1
-
-# from animations pt 4 in 112 website
-def getCachedPhotoImage(app, image):
-    # stores a cached version of the PhotoImage in the PIL/Pillow image
-    if ('cachedPhotoImage' not in image.__dict__):
-        image.cachedPhotoImage = ImageTk.PhotoImage(image)
-    return image.cachedPhotoImage
-
-
-def renderMap(app, canvas):
-    canvas.create_rectangle(0,0, app.width, app.height, outline='', 
-        fill='MistyRose4')
-    scaledMap = app.scaleImage(app.map, 1)
-    mapCenter = toCanvasCoords(np.array([[app.startLong, app.startLat]]), 
-                app.bounds, app.width, app.height)
-    cachedImage = getCachedPhotoImage(app, scaledMap)
-    canvas.create_image(mapCenter[0], mapCenter[1], image=cachedImage)
-    for pin in app.pins:
-        pin.redraw(app, canvas)

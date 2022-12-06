@@ -78,7 +78,7 @@ def formatLines(s):
         charLength = 0
         for word in splitAnswer:
             charLength += len(word) + 1
-            if charLength > 17:
+            if charLength > 50:
                 charLength = 0
                 lines = lines + [f'{word} ']
             else:

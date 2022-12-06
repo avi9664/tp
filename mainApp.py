@@ -1,16 +1,18 @@
-
-from gameMode import *
-from endMode import *
+from modes.gameMode import *
+from modes.menuMode import *
+from modes.popUpMode import *
+from modes.loadMode import *
 
 def appStarted(app):
-    app.timerDelay = 50
+    app.timerDelay = 100
     app.mouseMovedDelay = 5
-    app.mode = 'gameMode'
-    startGame(app)
+    app.mode = 'menuMode'
+    app.lineWidth = 50
+    initializeMenu(app)
 
-def playGame():
+def runAll():
     canvasWidth = 1000
     canvasHeight = 1000
     runApp(width=canvasWidth, height=canvasHeight)
 
-playGame()
+runAll()

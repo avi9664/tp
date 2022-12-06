@@ -4,15 +4,16 @@ from classes.pin import GuessPin
 from functions.drawShapes import drawPin
 from functions.strArrayStuff import formatLines
 
+# popup dialog box
 
 class PopUp:
     def __init__(self, app, content, heading, bg=True):
         self.content = content
         self.heading = heading
-        self.fontSize = 18
+        self.fontSize = 16
         self.headingSize = 24
         self.m = self.headingSize
-        self.w = self.m * 2 + self.fontSize * 17
+        self.w = self.m * 2 + (self.fontSize - 6) * app.lineWidth
         self.heights = self.measureHeight(self.content)
 
         spacing = len(self.content) * 5
@@ -22,6 +23,7 @@ class PopUp:
         self.cy = app.height/2
         self.visible = True
 
+    # draw map in background
     def drawBg(self, app, canvas):
         # aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
         bgLayer = Image.new('RGBA', (app.width, app.height), '#666')
@@ -30,6 +32,7 @@ class PopUp:
         bgLayer.putalpha(200)
         canvas.create_image(app.width/2, app.height/2, image=ImageTk.PhotoImage(bgLayer))
     
+    # calculate height of the popup
     def measureHeight(self, L):
         if L == []:
             return []
@@ -73,7 +76,7 @@ class PopUp:
                     startY += font + 5
             return None
 
-
+    # draw things inside popup at the right heights
     def drawContent(self, app, canvas):
         startY = self.cy - self.h/2 + self.m
         startX = self.cx
@@ -94,9 +97,7 @@ class PopUp:
             startY += self.heights[i] + 5
 
 
-
     def redraw(self, app, canvas):
         self.drawBg(app, canvas)
         self.drawPopUp(app, canvas)
         self.drawContent(app, canvas)
-        pass
