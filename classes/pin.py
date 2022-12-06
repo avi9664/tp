@@ -75,9 +75,11 @@ class GuessPin:
         return mixedRGB
     
     def mouseNearby(self, mouseX, mouseY):
+        pinHeight = 40
+        pinWidth = 30
         canvasX = self.canvasCoords[0]
         canvasY = self.canvasCoords[1]
-        return mouseInBounds(canvasX, canvasY, 30, 30, mouseX, mouseY)
+        return mouseInBounds(canvasX, canvasY - pinHeight/2, pinWidth, pinHeight, mouseX, mouseY)
 
     # draw arow pointing to answer
     def drawArrow(self, canvas, theta, dist):
