@@ -34,14 +34,14 @@ def backToMenu(app):
 # when you press the Load button
 def checkValue(app):
     if len(app.searchBox.value) == 0:
-        app.feedbackText = 'Type something in the textbox, you fool.'
+        app.feedbackText = 'Type something in the textbox, ye fool.'
     elif app.searchBox.value in app.sources:
         if app.clickedLoad == 0:
             app.feedbackText = """Okay, that matches one of our sources.\n
 Caution: This will take a while to load.
 It might also stop the app for a few minutes, so
 check the console to see its progress.\n
-Get a coffee. Take a shower. Nap. Touch some grass.\n
+Get a cup o' tea. Take a shower. Nap. Touch some grass.\n
 If you're fine with that, press "Load" again to continue."""
             app.clickedLoad += 1
         elif app.clickedLoad == 1:

@@ -37,7 +37,7 @@ class Map:
 
     def renderMap(self, app, canvas):
         canvas.create_rectangle(0,0, app.width, app.height, outline='', 
-            fill='MistyRose4')
+            fill='#8B8378')
         scaledMap = app.scaleImage(app.map, self.zoom)
         mapCenter = toCanvasCoords(np.array([[app.startLong, app.startLat]]), 
                     app.bounds, app.width, app.height)

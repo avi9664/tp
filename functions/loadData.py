@@ -11,16 +11,6 @@ from functions.strArrayStuff import findCentroid, extractCoords, findCentroidWit
 from tqdm import tqdm
 
 
-#####
-# all the extra parts are from:
-# online pyrosm tutorial: 
-# https://pyrosm.readthedocs.io/en/latest/basics.html#read-buildings
-# pandas:
-# https://pandas.pydata.org/docs/user_guide/10min.html 
-# numpy:
-# https://numpy.org/doc/stable/user/absolute_beginners.html 
-#####
-
 def loadData(app, query):
     print('Gathering data from OSM...', end='')
     fp = get_data(query)
@@ -64,6 +54,7 @@ def loadData(app, query):
         buildings.at[i,'coords'] = polyCoords
     print('Done!')
     print('Converting to a .csv file...', end='')
+    # https://stackoverflow.com/questions/35384358/how-to-open-my-files-in-data-folder-with-pandas-using-relative-path
     buildings.to_csv(f'{query}.csv')
     print('Done!')
     

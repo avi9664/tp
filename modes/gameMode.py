@@ -44,26 +44,13 @@ def adjustBounds(app):
 
 # set up everything
 def startGame(app):
-    # Sutro Tower, SF. From Google Maps.
     app.zoomFactor = 1 # in feet
 
-    # twin peaks
-    app.answer = {'name': 'Sutro Tower', 
-                    'pt': [-122.4528, 37.7552], 
-                    'category': 'tower'} 
     app.r = 2000
-    dispX, dispY = random.randint(-1 * app.r, app.r), random.randint(-1 * app.r, app.r)
-
-    app.startLong = app.answer['pt'][0] #+ dispX/288200
-    app.startLat = app.answer['pt'][1] #+ dispY/364000
-    app.long = app.startLong
-    app.lat = app.startLat
     
     app.answerList = []
     app.guessNum = 0
     app.guessLimit = 6
-
-    adjustBounds(app)
 
     app.mouseDist = [0,0]
     app.prevCoords = [0,0]
@@ -73,7 +60,7 @@ def startGame(app):
     app.mouseDrag = False
     app.pins = []
 
-    app.buildings = pd.read_csv('SanFrancisco.csv')
+    app.buildings = pd.read_csv(f'{app.places[app.fileIndex]}')
     # https://pyrosm.readthedocs.io/en/latest/basics.html#read-points-of-interest
     # frankly I do not give a damn about parking. public transportation for the win
     app.possibleAnswers = app.buildings[(pd.notna(app.buildings['name'])) &
@@ -81,12 +68,36 @@ def startGame(app):
                                     (((pd.notna(app.buildings['amenity'])) & 
                                 (app.buildings['amenity'] != 'parking')) | 
                             (pd.notna(app.buildings['shop'])))]
+    
+    findNewAnswer(app)
+    adjustBounds(app)
+
+    app.stepsLeft = ['Find a mystery location in six tries! Click and drag to pan the map.', 
+"To make a guess, move the cursor where you want to place a pin and press the spacebar.",
+"Are ye daft in the head? PRESS THE SPACEBAR.",
+'Hover over a pin to reveal the distance and direction you need to go.',
+"The closer to red the pin is, the closer you are to the location. Now can you make it in six?"]
+
     app.mapObject = Map(app)
     app.map = app.mapObject.createMap(app)
     app.dashboard = Dashboard(app)
     app.popUpDisplayed = None
     app.bg = None
     app.win = False
+
+# find new mystery location to search for
+def findNewAnswer(app):
+    app.answer = dict()
+    newAns = app.possibleAnswers.iloc[random.randint(0,len(app.possibleAnswers) - 1)]
+    app.answer['name'] = newAns['name']
+    app.answer['category'] = newAns['amenity'] if pd.notna(newAns['amenity']) else newAns['shop']
+    app.answer['pt'] = [newAns['cx'], newAns['cy']]
+
+    dispX, dispY = random.randint(-1 * app.r, app.r), random.randint(-1 * app.r, app.r)
+    app.startLong = app.answer['pt'][0] + dispX/288200
+    app.long = app.startLong
+    app.startLat = app.answer['pt'][1] + dispY/364000
+    app.lat = app.startLat
 
 # reset the game after you win/lose
 def reset(app):
@@ -97,17 +108,9 @@ def reset(app):
     app.dashboard.answerParts = app.answer['name']
     app.pins = []
 
-    newAns = app.possibleAnswers.iloc[random.randint(0,len(app.possibleAnswers) - 1)]
-    app.answerList = app.answerList + [{'name': app.answer['name'], 'guesses': app.guessNum}]
-    app.answer['name'] = newAns['name']
-    app.answer['category'] = newAns['amenity'] if pd.notna(newAns['amenity']) else newAns['shop']
-    app.answer['pt'] = [newAns['cx'], newAns['cy']]
+    findNewAnswer(app)
 
-    dispX, dispY = random.randint(-1 * app.r, app.r), random.randint(-1 * app.r, app.r)
-    app.startLong = app.answer['pt'][0] + dispX/288200
-    app.long = app.startLong
-    app.startLat = app.answer['pt'][1] + dispY/364000
-    app.lat = app.startLat
+    app.stepsLeft = []
 
     app.guessNum = 0
 
@@ -130,7 +133,11 @@ def dropPin(app, x, y):
     if (newPin.distance <= 100):
         app.win = True
         centerMapAtAnswer(app)
+        app.answerList = app.answerList + [{'name': app.answer['name'], 'guesses': app.guessNum}]
+        averageScore = sum([answer['guesses'] for answer in app.answerList])/len(app.answerList)
         app.popUpDisplayed = PopUp(app, ['You got the answer in',['PIN',f'*{app.guessNum}*'],
+        # https://www.w3schools.com/python/ref_func_round.asp
+                                f'Your average score is {round(averageScore, 2)}',
                                 Button('Reveal the answer', showAnswer),
                                 Button('Start a new game!', reset)],'Correct!')
         app.bg = app.getSnapshot()
@@ -184,6 +191,8 @@ def gameMode_mouseMoved(app, event):
         # from animations with oop: https://www.cs.cmu.edu/~112/notes/notes-oop-part1.html#oopExample
         if (pin.mouseNearby(event.x, event.y)):
             pin.displayStats = True
+            if len(app.stepsLeft) == 2:
+                app.stepsLeft.pop(0)
 
 # drag map if you're clicking and holding
 def gameMode_timerFired(app):
@@ -208,6 +217,7 @@ def gameMode_keyPressed(app, event):
     elif event.key == 'Down':
         app.lat -= app.dLat * shift
     elif event.key == 'Space':
+        app.dashboard.spacePressed(app, event)
         app.guessNum += 1
         dropPin(app, app.mouseCoords[0], app.mouseCoords[1])
     adjustBounds(app)

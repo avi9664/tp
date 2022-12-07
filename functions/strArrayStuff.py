@@ -1,23 +1,15 @@
 import numpy as np
 
-#####
-# numpy:
-# https://numpy.org/doc/stable/user/absolute_beginners.html 
-#####
-
-## maybe use repr and eval? (eval is dangerous)
-
 def strToArray(s, toList=False):
     s = stripParens(s)
     splitCoords = s.split('\n ')
     arr = np.zeros((len(splitCoords),2))
     for i in range(len(splitCoords)):
         coords = stripParens(splitCoords[i])
-        longlat = coords.split('   ')
-        if (len(longlat) > 2):
-            for string in longlat:
-                if string == '':
-                    longlat.remove(string)
+        longlat = coords.split(' ')
+        longlat = [longlat[0], longlat[-1]]
+        if len(longlat) < 2:
+            print(longlat)
         arr[i,0] = longlat[0]
         arr[i,1] = longlat[1]
     if toList:
@@ -72,13 +64,14 @@ def extractCoords(polygon):
         coordList = coordList + [[long, lat]]
     return coordList
 
-def formatLines(s):
+# splits a very long string into multiple lines
+def formatLines(s, defaultLength = 50):
         splitAnswer = s.split(' ')
         lines = ['']
         charLength = 0
         for word in splitAnswer:
             charLength += len(word) + 1
-            if charLength > 50:
+            if charLength > defaultLength:
                 charLength = 0
                 lines = lines + [f'{word} ']
             else:
