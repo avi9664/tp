@@ -4,11 +4,13 @@ It's a geography game kind of like a reverse Geoguessr- given a map of a city (e
 Just as a caution, the UI is a little snarky. Adds some character.
 
 ## Installing modules:
-- Download anaconda! (For Pyrosm, installing with pip seems to be a bit tricky. You can try though and let me know if it works.)
+- I suggest downloading anaconda! (For Pyrosm, installing with pip seems to be a bit tricky. You can try though and let me know if it works.)
 - If using Conda, make sure your interpreter is set to `Python 3.9.13 ('base')`. You may have to uninstall regular ol' Python.
-- Install numpy, pandas, tqdm (https://github.com/tqdm/tqdm) and pyrosm (https://pyrosm.readthedocs.io/en/latest/installation.html)
+- Make sure that you have `numpy`, `pandas`, `glob`, `tqdm` (https://github.com/tqdm/tqdm) and `pyrosm` (https://pyrosm.readthedocs.io/en/latest/installation.html)
+- I highly recommend loading a city because I had insufficient time to figure out how to load an entire country. Processing a gigantic csv file will probably make your computer explode.
 
 ## How to run on your local computer:
-- Run `loadData.py` to get a csv of a city. The default I'm using is San Francisco, and for the purposes of test-running, should be kept at San Francisco (for now).
-- Run `mainApp.py` to play the game!
-- The first location that comes up (for testing reasons) is Sutro Tower. It should appear on the center of your map. Click on it to test the win sequence! After that, the game should behave regularly.
+- Run `mainApp.py` to start the app!
+- before pressing "Play Game", click on "Load Data" and load a .csv file. The .csvs themselves, which are downloaded through `pyrosm`, may have strange bits of data that make the game crash. That's on the modules, not me.
+- on that note, please don't add any of your own funny csvs into this folder unless they were created through the `loadData` function. The game may read your csv by accident because of how the `glob` module works. (side note: I like the name glob. It's a funny name :D)
+
