@@ -10,7 +10,7 @@ Just as a caution, the UI is a little snarky. Adds some character.
 
 ## How to run on your local computer:
 - Run `mainApp.py` to start the app!
-- before pressing "Play Game", click on "Load Data" and load a .csv file. The app may freeze for a few minutes while it's loading the .csv's-- look at the Python console to see how much time the computer needs to load the dataset. (You can always ctrl-c at any time!)
+- before pressing "Play Game", click on "Load Data" and load a .csv file of any city you want. The app may freeze for a few minutes while it's loading the .csv's-- look at the Python console to see how much time the computer needs to load the dataset.
 - The .csvs themselves, which are downloaded through `pyrosm`, may have strange bits of data that make the game crash. That's on the modules, not me.
 - on that note, please don't add any of your own funny csvs into this folder unless they were created through the `loadData` function. The game may read your csv by accident because of how the `glob` module works. (side note: I like the name glob. It's a funny name :D)
 - I highly recommend loading a city because I had insufficient time to figure out how to load an entire country. Processing a gigantic csv file will probably make your computer explode.
