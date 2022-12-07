@@ -38,7 +38,7 @@ class GuessPin:
         answerLat = app.answer['pt'][1]
         self.distance, self.angle = findDistance(self.mapCoords[:,0], self.mapCoords[:,1],
                                                  answerLong, answerLat)
-        self.normDist = 1 - (math.sqrt(self.distance) / 100)
+        self.normDist = 1 - (self.distance /app.r)
         if self.normDist < 0: self.normDist = 0
         self.distStr = friendlyDistString(self.distance)
 

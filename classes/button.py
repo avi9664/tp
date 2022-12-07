@@ -3,8 +3,8 @@ from cmu_112_graphics import *
 from functions.mouseInBounds import mouseInBounds
 class Button:
     def __init__(self, value, function, x0=0, y0=0, customW=0, customH=0, 
-        unfocused='AntiqueWhite3', focused='AntiqueWhite2', outline='', 
-        textColor='black'):
+        unfocused='#1E193E', focused='#F80E55', outline='', 
+        textColor='#F7F6F7'):
         self.fontSize = 14
         self.m = self.fontSize
         self.w = len(value) * self.fontSize + 2 * self.m if customW == 0 else customW

@@ -13,7 +13,7 @@ from classes.button import Button
 
 def popUpMode_redrawAll(app, canvas):
     app.mapObject.renderMap(app, canvas)
-    drawPin(canvas, 'green', app.width/2, app.height/2)
+    drawPin(canvas, '#1E193E', app.width/2, app.height/2)
     if (app.popUpDisplayed.visible):
         app.popUpDisplayed.redraw(app, canvas)
     else:

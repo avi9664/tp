@@ -22,7 +22,7 @@ def setUpLoadMenu(app):
 
     app.loadButton = Button('Load', checkValue)
     app.loadButton.x = app.width * 0.7 + 10 + app.loadButton.w/2
-    app.loadButton.y = app.height * 0.1 + 5
+    app.loadButton.y = app.height * 0.1 + 20
     app.clickedLoad = 0
 
     app.backButton = Button('Back to Main Menu', backToMenu, 100, app.height * 0.7)

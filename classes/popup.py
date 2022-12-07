@@ -63,7 +63,7 @@ class PopUp:
             return None
         elif isinstance(item, str):
             if item == 'PIN':
-                drawPin(canvas, 'red', startX, startY + 40)
+                drawPin(canvas, '#F80E55', startX, startY + 40)
             else:
                 font = self.fontSize
                 # heading
