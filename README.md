@@ -1,5 +1,6 @@
 # Where On Earth Is That?!
 It's a geography game kind of like a reverse Geoguessr- given a map of a city (e.g. your hometown), you have six tries to find a mystery location on a map, like a restaurant, a museum, or a record store.
+![image](https://user-images.githubusercontent.com/32148378/206231866-08cc4ace-6bcc-4671-9466-d5760a909a02.png)
 
 Just as a caution, the UI is a little snarky. Adds some character.
 
