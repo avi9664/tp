@@ -11,6 +11,7 @@ Just as a caution, the UI is a little snarky. Adds some character.
 
 ## How to run on your local computer:
 - Run `mainApp.py` to start the app!
-- before pressing "Play Game", click on "Load Data" and load a .csv file. The .csvs themselves, which are downloaded through `pyrosm`, may have strange bits of data that make the game crash. That's on the modules, not me.
+- before pressing "Play Game", click on "Load Data" and load a .csv file. The app may freeze for a moment while it's loading the .csv's; 
+- The .csvs themselves, which are downloaded through `pyrosm`, may have strange bits of data that make the game crash. That's on the modules, not me.
 - on that note, please don't add any of your own funny csvs into this folder unless they were created through the `loadData` function. The game may read your csv by accident because of how the `glob` module works. (side note: I like the name glob. It's a funny name :D)
 
