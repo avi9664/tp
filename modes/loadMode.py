@@ -5,6 +5,7 @@ from functions.loadData import loadData
 from cmu_112_graphics import *
 from classes.button import Button
 from classes.textbox import TextBox
+import glob
 
 # this is what appears when you click on "Load Data"
 
@@ -31,6 +32,7 @@ def setUpLoadMenu(app):
 def backToMenu(app):
     app.mode = 'menuMode'
 
+
 # when you press the Load button
 def checkValue(app):
     if len(app.searchBox.value) == 0:
@@ -47,6 +49,7 @@ If you're fine with that, press "Load" again to continue."""
         elif app.clickedLoad == 1:
             app.clickedLoad = 0
             loadData(app, app.searchBox.value)
+            app.places = glob.glob("*.csv")
     else:
         app.feedbackText = "That's not in our database."
 
