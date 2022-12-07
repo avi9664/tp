@@ -1,6 +1,5 @@
 # Where On Earth Is That?!
 It's a geography game kind of like a reverse Geoguessr- given a map of a city (e.g. your hometown), you have six tries to find a mystery location on a map, like a restaurant, a museum, or a record store.
-![image](https://user-images.githubusercontent.com/32148378/206231866-08cc4ace-6bcc-4671-9466-d5760a909a02.png)
 
 Just as a caution, the UI is a little snarky. Adds some character.
 
@@ -16,3 +15,6 @@ Just as a caution, the UI is a little snarky. Adds some character.
 - on that note, please don't add any of your own funny csvs into this folder unless they were created through the `loadData` function. The game may read your csv by accident because of how the `glob` module works. (side note: I like the name glob. It's a funny name :D)
 - I highly recommend loading a city because I had insufficient time to figure out how to load an entire country. Processing a gigantic csv file will probably make your computer explode.
 - Finally, after loading your data, you can play the game!
+
+## Here's a sneakpeek at what the game looks like:
+![image](https://user-images.githubusercontent.com/32148378/206231866-08cc4ace-6bcc-4671-9466-d5760a909a02.png)
