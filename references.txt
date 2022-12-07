@@ -1,9 +1,0 @@
-
-all the extra parts are from:
-
-pyrosm: 
-https://pyrosm.readthedocs.io/en/latest/basics.html#read-buildings
-pandas:
-https://pandas.pydata.org/docs/user_guide/10min.html 
-numpy:
-https://numpy.org/doc/stable/user/absolute_beginners.html 
