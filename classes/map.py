@@ -30,11 +30,12 @@ class Map:
             # https://pillow.readthedocs.io/en/stable/reference/ImageDraw.html#PIL.ImageDraw.ImageDraw.polygon
             draw.polygon(canvasCoords,fill='#C78FB4')
         return mapImage
-
+    # new map
     def reset(self, app):
         self.mapBounds(app)
         self.filterBuildings(app)
 
+    # render as an image (from 112 graphics part 4: images)
     def renderMap(self, app, canvas):
         canvas.create_rectangle(0,0, app.width, app.height, outline='', 
             fill='#C78FB4')
@@ -63,12 +64,7 @@ class Map:
         # how far the map reaches on each side
         self.latRadius = radius/364000
         self.longRadius = radius/288200
-
-        # how much the map inches to the side when you pan it (using mouse or keys)
-        # app.dLat = app.zoomFactor / 364000
-        # app.dLong = app.zoomFactor / 288200
-        # https://stackoverflow.com/questions/36921951/truth-value-of-a-series-is-ambiguous-use-a-empty-a-bool-a-item-a-any-o
-        # https://stackoverflow.com/questions/32713221/how-to-use-a-conditional-statement-based-on-dataframe-boolean-value-in-pandas
+        
         self.longMin = app.long - self.longRadius
         self.latMin = app.lat - self.latRadius
         self.longMax = app.long + self.longRadius
@@ -76,6 +72,8 @@ class Map:
         self.bounds = [self.longMin, self.latMin, self.longMax, self.latMax]
 
     def filterBuildings(self, app):
+        # https://stackoverflow.com/questions/36921951/truth-value-of-a-series-is-ambiguous-use-a-empty-a-bool-a-item-a-any-o
+        # https://stackoverflow.com/questions/32713221/how-to-use-a-conditional-statement-based-on-dataframe-boolean-value-in-pandas
         # bug fixing: https://stackoverflow.com/questions/17216153/python-pandas-boolean-indexing-on-multiple-columns
         self.buildingsToDraw = app.buildings[(app.buildings['cx'] < self.longMax) & 
                                             (app.buildings['cx'] > self.longMin) &

@@ -1,11 +1,11 @@
 import string
 from cmu_112_graphics import *
+
 class TextBox:
-    def __init__(self, label):
+    def __init__(self):
         self.value = ''
-        self.selected = True
-        self.label = label
         self.margin = 10
+        self.selected = True
 
     def redraw(self, app, canvas, x0, y0, w):
         m = self.margin
@@ -18,6 +18,7 @@ class TextBox:
         font = 'Helvetica ' + str(app.fontSize), fill=app.text,
         anchor='nw')
 
+    # typing interactivity
     def keyPressed(self, app, event):
         exceptions = [' ', '.', '-', '\'', '_', 'Backspace']
         key = ' ' if event.key == 'Space' else event.key

@@ -5,11 +5,12 @@ import numpy as np
 import pandas as pd
 # import file code from 
 # https://stackoverflow.com/questions/4383571/importing-files-from-different-folder?page=1&tab=scoredesc#tab-top
-from functions.strArrayStuff import findCentroid, extractCoords, findCentroidWithNumPy
+from functions.strArrayStuff import extractCoords, findCentroidWithNumPy
 
 # progress bar from https://stackoverflow.com/questions/3160699/python-progress-bar
 from tqdm import tqdm
 
+# loads map data for the game
 
 def loadData(app, query):
     print('Gathering data from OSM...', end='')
@@ -20,10 +21,6 @@ def loadData(app, query):
     print('Extracting buildings...', end='')
     buildings = osm.get_buildings()
     print('Done!')
-    # print sample format of a random geopandas entry for future reference
-    # sampleFormat = buildings.iloc[20]
-    # print(sampleFormat)
-    # print(sampleFormat['geometry'])
     print(f'{len(buildings)} buildings will need to be loaded and processed...')
 
     buildings['cx'] = 0
@@ -33,11 +30,6 @@ def loadData(app, query):
     # from https://www.geeksforgeeks.org/python-pandas-dataframe-astype/#:~:text=astype()%20method%20is%20used,type%20to%20another%20data%20type.
     buildings['coords'] = buildings['coords'].astype('object')
 
-
-
-    # somehow have a loading screen that says:
-    # This will probably take a few minutes.
-    # In the meantime, go to the bathroom, get some coffee, stretch, touch grass...
 
     # I'm also using a small module called tqdm which basically creates a progress
     # bar in the console for tasks that take a long time, such as processing data.

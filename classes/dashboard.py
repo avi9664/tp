@@ -5,6 +5,7 @@ from functions.drawShapes import drawPin
 from functions.strArrayStuff import formatLines
 from functions.mouseInBounds import mouseInBounds
 
+# help popUp
 def getHelp(app):
     allSteps = ['Find a mystery location in 6 tries!',
     "You're given the type of place it is.",
@@ -63,7 +64,7 @@ class Dashboard:
         canvas.create_text(cx, h - m, text=app.answer['category'], 
                         font=f'Arial {smallerFont}', anchor='n')
     
-    # drawing tutorial
+    # draw tutorial instructions
     def drawTutorial(self, app, canvas, h, font, m):
         if len(app.stepsLeft) > 0:
             text = formatLines(app.stepsLeft[0])

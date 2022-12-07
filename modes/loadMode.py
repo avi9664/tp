@@ -12,7 +12,7 @@ def setUpLoadMenu(app):
     app.bg = 'white'
     app.text = 'black'
     app.fontSize = 16
-    app.searchBox = TextBox('choose a city')
+    app.searchBox = TextBox()
 
     app.sources = sorted(sources._all_sources)
     app.clickableResults = []
@@ -50,7 +50,7 @@ If you're fine with that, press "Load" again to continue."""
     else:
         app.feedbackText = "That's not in our database."
 
-# search in the pyrosm database. convert to binary search later
+# search in the pyrosm database for results
 def searchSources(app, text):
     results = []
     if text == '':
@@ -74,7 +74,7 @@ def setName(app):
     searchSources(app, app.searchBox.value)
 
 # buttons currently don't change color when they hover. 
-# I'm too damn exhausted to implement that.
+# I don't have time to implement that.
 def loadMode_mousePressed(app, event):
     if app.loadButton.mouseNearby(event.x, event.y):
         app.loadButton.mousePressed(app)

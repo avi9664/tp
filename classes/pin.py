@@ -1,16 +1,3 @@
-# GuessPin
-# properties:
-# map coordinates ✅
-# distance from actual location + angle ✅
-# calculate distance from actual location ✅
-# guess # ✅
-# color ✅
-# calculate color based on distance from actual location ✅
-
-# methods:
-# redrawPin ✅
-# redrawClues (an arrow pointing in the direction of the mystery location, and some text hinting at how far away it is) ✅
-
 from cmu_112_graphics import *
 from functions.strArrayStuff import toMapCoords, toCanvasCoords, friendlyDistString
 from functions.mouseInBounds import mouseInBounds
@@ -18,6 +5,7 @@ import math
 from functions.drawShapes import drawPin, angle
 import numpy as np
 
+# find distance between your guess and the actual answer + the direction
 def findDistance(x0, y0, x1, y1):
     dx = (x1 - x0) * 288200
     dy = (y1 - y0) * 364000
@@ -43,14 +31,7 @@ class GuessPin:
         self.distStr = friendlyDistString(self.distance)
 
         self.num = guessNum
-        # 1 degree of latitude ~ 364000 ft ~ around 69 miles
-        # 1000 ft = 0.0027 degrees of longitude
-        # 1 degree of longitude ~ 288200 ft ~ 54.6 miles
-        # 1000 ft = 0.0034 degrees of longitude
 
-        # 10000, 1000, 100, 10
-        # 4      3     2    1
-        # 1                 0
 
         self.color = self.getColor(app) # change later
     
@@ -64,7 +45,7 @@ class GuessPin:
         endRGB = list(int(cEnd[i:i+2], 16) for i in (0, 2, 4))
 
         # find a point in between the two colors
-        # similar to the mixing colors problem in HW 1
+        # similar to the mixing colors problem in 15112 HW 1
         r = (endRGB[0] - startRGB[0]) * self.normDist + startRGB[0]
         g = (endRGB[1] - startRGB[1]) * self.normDist + startRGB[1]
         b = (endRGB[2] - startRGB[2]) * self.normDist + startRGB[2]
@@ -74,6 +55,7 @@ class GuessPin:
 
         return mixedRGB
     
+    # check if mouse is hovering over pin
     def mouseNearby(self, mouseX, mouseY):
         pinHeight = 40
         pinWidth = 30
@@ -81,7 +63,7 @@ class GuessPin:
         canvasY = self.canvasCoords[1]
         return mouseInBounds(canvasX, canvasY - pinHeight/2, pinWidth, pinHeight, mouseX, mouseY)
 
-    # draw arow pointing to answer
+    # draw arrow pointing to answer
     def drawArrow(self, canvas, theta, dist):
         tailX, tailY = self.canvasCoords[0], self.canvasCoords[1]
         headX, headY = angle(self.canvasCoords[0], self.canvasCoords[1], theta, dist)
@@ -97,7 +79,6 @@ class GuessPin:
         drawPin(canvas, self.color, self.canvasCoords[0], self.canvasCoords[1], str(self.num))
         if self.displayStats:
             textY = self.canvasCoords[1] + 10 if (self.angle > 0) else self.canvasCoords[1] - 50
-            # if distance > 1000 feet, return dist in miles; if not, then return distance in feet
             canvas.create_text(self.canvasCoords[0], textY, text=self.distStr)
             self.drawArrow(canvas, self.angle, (1 - self.normDist) * 60 + 10)
 

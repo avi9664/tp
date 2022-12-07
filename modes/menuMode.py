@@ -23,22 +23,23 @@ def initializeMenu(app):
     # cut off .csv extension at end of file name
     app.fileIndex = 0
 
-
 def playGame(app):
     if (app.places != []):
         app.mode = 'gameMode'
         startGame(app)
 
+# load data menu
 def loadMenu(app):
     app.mode = 'loadMode'
     setUpLoadMenu(app)
 
-
+# detect button presses
 def menuMode_mousePressed(app, event):
     for button in app.menuButtons:
         if button.mouseNearby(event.x, event.y):
             button.mousePressed(app)
 
+# switch between locations
 def menuMode_keyPressed(app, event):
     if (event.key == 'Left'):
         app.fileIndex = (app.fileIndex - 1) % len(app.places)

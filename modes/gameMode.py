@@ -72,6 +72,7 @@ def startGame(app):
     findNewAnswer(app)
     adjustBounds(app)
 
+    # tutorial
     app.stepsLeft = ['Find a mystery location in six tries! Click and drag to pan the map.', 
 "To make a guess, move the cursor where you want to place a pin and press the spacebar.",
 "Are ye daft in the head? PRESS THE SPACEBAR.",
@@ -200,15 +201,9 @@ def gameMode_timerFired(app):
     adjustBounds(app)
 
 def gameMode_keyPressed(app, event):
-    # press z and x to zoom, arrow keys to pan
+    # arrow keys to pan
     shift = 100
-    if event.key == 'z':
-        if (app.zoomFactor < 1.5):
-            app.zoomFactor += 0.1
-    elif event.key == 'x':
-        if (app.zoomFactor > 0.1):
-            app.zoomFactor -= 0.1
-    elif event.key == 'Right':
+    if event.key == 'Right':
         app.long += app.dLong * shift
     elif event.key == 'Left':
         app.long -= app.dLong * shift

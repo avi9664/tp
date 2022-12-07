@@ -24,6 +24,7 @@ class Button:
     def mousePressed(self, app):
         self.function(app)
 
+    # detect click
     def mouseNearby(self, mouseX, mouseY):
         return mouseInBounds(self.x, self.y, self.w, self.h, mouseX, mouseY)
 

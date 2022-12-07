@@ -1,5 +1,6 @@
 import numpy as np
 
+# extracts coordinates from really weird string with parentheses and stuff
 def strToArray(s, toList=False):
     s = stripParens(s)
     splitCoords = s.split('\n ')
@@ -44,7 +45,7 @@ def toMapCoords(coords, bounds, cw, ch,
         return list(newCoords.flatten())
     return newCoords
 
-
+# get rid of parentheses to convert properly to floats
 def stripParens(s):
     while (not s[0].isdigit() and s[0] != '-'):
         s = s[1:]
@@ -77,15 +78,6 @@ def formatLines(s, defaultLength = 50):
             else:
                 lines[-1] += f'{word} '
         return lines
-
-
-def findCentroid(polygon):
-    s = str(polygon.centroid)
-    stripped = s[7:-1]
-    latlong = stripped.split(' ')
-    long = float(latlong[0])
-    lat = float(latlong[1])
-    return long, lat
 
 def findCentroidWithNumPy(longlats):
     centroid = np.mean(longlats, axis=0)

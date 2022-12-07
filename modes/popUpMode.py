@@ -6,7 +6,6 @@ from classes.button import Button
 
 # The pop-ups that appear:
 # Instructions
-# Settings
 # Winning
 # Losing
 # Back button (after game over) is to return to the popUp after displaying the answer

@@ -25,7 +25,6 @@ class PopUp:
 
     # draw map in background
     def drawBg(self, app, canvas):
-        # aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
         bgLayer = Image.new('RGBA', (app.width, app.height), '#666')
 
         # https://www.geeksforgeeks.org/python-pil-putalpha-method/
@@ -55,6 +54,7 @@ class PopUp:
         y1 = self.cy + self.h/2
         canvas.create_rectangle(x0, y0, x1, y1, fill='white')
     
+    # helper for drawContent (below)
     def drawContentHelper(self, app, canvas, item, startX, startY):
         if isinstance(item, Button):
             # for mousePressed
